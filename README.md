@@ -57,4 +57,4 @@ Then you can run
 
     npm run dev
 
-Now you may visit localhost:3000 where you should see the default vue project setup.
+Now you may visit localhost:3000/ping in any browser, where you should see the word pong.
