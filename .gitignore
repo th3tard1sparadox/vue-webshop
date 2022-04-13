@@ -1,2 +1,8 @@
 # Ignore virtual enviroment
 env/
+
+# Ignore any database-file
+*.db
+
+# Ignore python cache
+__pycache__/
