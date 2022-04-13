@@ -15,7 +15,7 @@ with app.app_context():
     db.create_all()
 
 # CORS
-# CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app) # TODO: limit to specific origins
 
 # ping test
 @app.route('/ping', methods=['GET'])
