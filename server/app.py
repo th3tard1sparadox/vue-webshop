@@ -38,8 +38,14 @@ def add_item():
     if request.method == 'POST':
         name = request.form['name']
         quantity = int(request.form['quantity'])
-        displayed = request.form['displayed'] == 'on'
-        item = Item(name, quantity, displayed)
+        try:
+            displayed = request.form['displayed'] == 'on'
+        except Exception:
+            displayed = False
+        description = request.form['description']
+        price = request.form['price']
+        picture = request.form['picture']
+        item = Item(name, description, price, picture, quantity, displayed)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('show_all'))
