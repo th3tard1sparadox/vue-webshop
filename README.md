@@ -10,7 +10,7 @@ These are the specifications the project is based on.
 
 The project will be a webshop where you can make group orders. This would include accounts, wishlists, a dynamic shoppingbag which updates whenever another person in the group adds something to the bag, a listing page where you can see the products and some sort of payment solution.
 
-The accounts are planned to be connected to Google, and will use their login. The payment is still not entierly decided how it will be done, but there are some thoughts about using PayPal.
+The accounts are planned to be connected to Google, and will use their login. ~~The payment is still not entierly decided how it will be done, but there are some thoughts about using PayPal.~~ The payment will be handeled using Stripe. Stripe has several different tests, so no payments have to be made to ensure that it is working.
 
 ### Technological
 
