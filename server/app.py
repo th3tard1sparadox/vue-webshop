@@ -29,6 +29,14 @@ CORS(app) # TODO: limit to specific origins
 def ping_pong():
     return jsonify('pong')
 
+@app.route('/products', methods=['GET'])
+def get_obj():
+    return jsonify({'name': 'item name',
+                    'picture': 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+                    'desc': 'item desc goes here',
+                    'price': '150',
+                    'path': '/ping'})
+
 @app.route('/', methods=['GET'])
 def show_all():
     return render_template('show_all.html', items = Item.query.all())

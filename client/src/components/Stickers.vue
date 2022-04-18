@@ -17,7 +17,7 @@ export default {
     components: {
         ProductCard
     },
-    data() {
+    data: function() {
         return {
             item: {
                 name: "item name",
@@ -27,8 +27,13 @@ export default {
                 path: '/ping'
             }
         }
+    },
+    created: async function() {
+        const gResponse = await fetch("http://localhost:5000/products");
+        const gObject = await gResponse.json();
+        this.item = gObject;
     }
-}
+};
 </script>
 
 <style>
