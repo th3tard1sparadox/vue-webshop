@@ -1,11 +1,11 @@
 <template>
-    <n-card title="item name" hoverable @click="gotoPing">
+    <n-card :title="name" hoverable @click="productPage">
         <template #cover>
-            <img src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg">
+            <img :src="picture">
         </template>
-        item description
+        {{ desc }}
         <template #footer>
-            price
+            {{ price }} kr
         </template>
     </n-card>
 </template>
@@ -14,10 +14,17 @@
 export default {
     name: 'ProductCard',
     methods: {
-        gotoPing: function (event) {
-            this.$router.push('/ping')
+        productPage: function (event) {
+            this.$router.push(this.path)
         },
-    }
+    },
+    props: [
+        'name',
+        'picture',
+        'desc',
+        'price',
+        'path'
+    ]
 }
 </script>
 

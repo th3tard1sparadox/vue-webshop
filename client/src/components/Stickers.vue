@@ -1,29 +1,32 @@
-<script setup>
-import ProductCard from "./ProductCard.vue";
-</script>
-
 <template>
     <n-grid :x-gap="30" :y-gap="30" :cols="5">
         <n-gi
-            v-for="i in 30"
-            :key="i"
+            v-for="product in products"
         >
-            <ProductCard />
+            <ProductCard :name="product.name" :picture="product.picture" :desc="product.desc" :price="product.price" :path="product.path" />
         </n-gi>
     </n-grid>
 </template>
 
 <!-- TODO: fetch items from database -->
 <script>
-import { defineComponent, ref } from "vue";
+import ProductCard from "./ProductCard.vue";
 
-export default defineComponent({
-    setup() {
+export default {
+    components: {
+        ProductCard
+    },
+    data: function() {
         return {
-            gridItemCount: ref(30) // TODO: use variable.
-        };
+            products: []
+        }
+    },
+    created: async function() {
+        const gResponse = await fetch("http://localhost:5000/products");
+        const gObject = await gResponse.json();
+        this.products = gObject;
     }
-});
+};
 </script>
 
 <style>

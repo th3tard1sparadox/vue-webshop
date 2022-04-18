@@ -7,12 +7,12 @@
 <script>
 export default {
     name: 'Ping',
-    data: function(){
+    data: function() {
         return {
             pong: ''
         }
     },
-    created: async function(){
+    created: async function() {
         const gResponse = await fetch("http://localhost:5000/ping");
         const gObject = await gResponse.json();
         this.pong = gObject;
