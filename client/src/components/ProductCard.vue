@@ -1,11 +1,11 @@
 <template>
-    <n-card title="item name" hoverable @click="gotoPing">
+    <n-card :title="name" hoverable @click="gotoPing">
         <template #cover>
-            <img src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg">
+            <img :src="picture">
         </template>
-        item description
+        {{ desc }}
         <template #footer>
-            price
+            {{ price }} kr
         </template>
     </n-card>
 </template>
@@ -17,7 +17,13 @@ export default {
         gotoPing: function (event) {
             this.$router.push('/ping')
         },
-    }
+    },
+    props: [
+        'name',
+        'picture',
+        'desc',
+        'price'
+    ]
 }
 </script>
 
