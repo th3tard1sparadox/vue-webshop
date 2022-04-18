@@ -4,7 +4,7 @@
             v-for="i in 30"
             :key="i"
         >
-            <ProductCard :name="item.name" :picture="item.picture" :desc="item.desc" :price="item.price" />
+            <ProductCard :name="item.name" :picture="item.picture" :desc="item.desc" :price="item.price" :path="item.path" />
         </n-gi>
     </n-grid>
 </template>
@@ -23,7 +23,8 @@ export default {
                 name: "item name",
                 picture: "https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg",
                 desc: "hello this is item desc",
-                price: 150
+                price: 150,
+                path: '/ping'
             }
         }
     }

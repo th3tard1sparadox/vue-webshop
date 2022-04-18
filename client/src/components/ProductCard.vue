@@ -1,5 +1,5 @@
 <template>
-    <n-card :title="name" hoverable @click="gotoPing">
+    <n-card :title="name" hoverable @click="productPage">
         <template #cover>
             <img :src="picture">
         </template>
@@ -14,15 +14,16 @@
 export default {
     name: 'ProductCard',
     methods: {
-        gotoPing: function (event) {
-            this.$router.push('/ping')
+        productPage: function (event) {
+            this.$router.push(this.path)
         },
     },
     props: [
         'name',
         'picture',
         'desc',
-        'price'
+        'price',
+        'path'
     ]
 }
 </script>
