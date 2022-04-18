@@ -1,10 +1,9 @@
 <template>
     <n-grid :x-gap="30" :y-gap="30" :cols="5">
         <n-gi
-            v-for="i in 30"
-            :key="i"
+            v-for="product in products"
         >
-            <ProductCard :name="item.name" :picture="item.picture" :desc="item.desc" :price="item.price" :path="item.path" />
+            <ProductCard :name="product.name" :picture="product.picture" :desc="product.desc" :price="product.price" :path="product.path" />
         </n-gi>
     </n-grid>
 </template>
@@ -19,19 +18,13 @@ export default {
     },
     data: function() {
         return {
-            item: {
-                name: "item name",
-                picture: "https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg",
-                desc: "hello this is item desc",
-                price: 150,
-                path: '/ping'
-            }
+            products: []
         }
     },
     created: async function() {
         const gResponse = await fetch("http://localhost:5000/products");
         const gObject = await gResponse.json();
-        this.item = gObject;
+        this.products = gObject;
     }
 };
 </script>
