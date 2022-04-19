@@ -29,21 +29,31 @@ CORS(app) # TODO: limit to specific origins
 def ping_pong():
     return jsonify('pong')
 
-@app.route('/products', methods=['GET'])
+@app.route('/products', methods=['GET', 'POST'])
 def get_obj():
-    products = []
-    products = Item.query.filter_by(displayed=True)
-    products_response = {}
-    for product in products:
-        products_response[product.id] = {
-            'id': product.id,
-            'name': product.name,
-            'picture': product.picture,
-            'desc': product.description,
-            'price': product.price,
-            'path': '/ping'
-        }
-    return jsonify(products_response)
+    if request.method == 'GET':
+        products = []
+        products = Item.query.filter_by(displayed=True)
+        products_response = {}
+        for product in products:
+            products_response[product.id] = {
+                'name': product.name,
+                'picture': product.picture,
+                'desc': product.description,
+                'price': product.price,
+                'path': '/stickers/' + str(product.id)
+            }
+        return jsonify(products_response)
+    elif request.method == 'POST':
+        print(request.data)
+        p_id = request.get_json()
+        product = Item.query.filter_by(id=p_id).first()
+        return jsonify({
+                'name': product.name,
+                'picture': product.picture,
+                'desc': product.description,
+                'price': product.price,
+            })
 
 @app.route('/', methods=['GET'])
 def show_all():

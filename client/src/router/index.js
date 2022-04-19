@@ -19,6 +19,11 @@ const routes = [
         name: "Stickers",
         component: Stickers
     },
+    {
+        path: '/stickers/:id',
+        name: "Sticker",
+        component: async () => await import('../components/ProductPage.vue')
+    },
 ];
 
 const router = createRouter({
