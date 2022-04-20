@@ -25,7 +25,6 @@ export default {
         }
     },
     created: async function() {
-        console.log(this.$route.params.id);
         const gResponse = await fetch("http://localhost:5000/products", {
             method: 'POST',
             headers: {
