@@ -1,5 +1,5 @@
 <template>
-    <n-grid :x-gap="30" :y-gap="30" :cols="5">
+    <n-grid :x-gap="30" :y-gap="30" cols="1 s:2 m:3 l:5" responsive="screen">
         <n-gi
             v-for="product in products"
         >
@@ -8,7 +8,6 @@
     </n-grid>
 </template>
 
-<!-- TODO: fetch items from database -->
 <script>
 import ProductCard from "./ProductCard.vue";
 
