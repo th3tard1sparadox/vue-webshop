@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
 
-import jwt
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
 
 # config
 DEBUG = True
@@ -27,38 +27,6 @@ with app.app_context():
 
 # CORS init
 CORS(app) # TODO: limit to specific origins
-
-def token_required(f):
-    @wraps(f)
-    def _verify(*args, **kwargs):
-        auth_headers = request.headers.get('Authorization', '').split()
-
-        invalid_msg = {
-            'message': 'Invalid token. Registeration and / or authentication required',
-            'authenticated': False
-        }
-        expired_msg = {
-            'message': 'Expired token. Reauthentication required.',
-            'authenticated': False
-        }
-
-        if len(auth_headers) != 2:
-            return jsonify(invalid_msg), 401
-
-        try:
-            token = auth_headers[1]
-            data = jwt.decode(token, app.config['SECRET_KEY'])
-            user = User.query.filter_by(email=data['sub']).first()
-            if not user:
-                raise RuntimeError('User not found')
-            return f(user, *args, **kwargs)
-        except jwt.ExpiredSignatureError:
-            return jsonify(expired_msg), 401
-        except (jwt.InvalidTokenError, Exception) as e:
-            print(e)
-            return jsonify(invalid_msg), 401
-
-    return _verify
 
 # ping test
 @app.route('/ping', methods=['GET'])
@@ -126,21 +94,42 @@ def login():
     data = request.get_json()
     user = User.authenticate(**data)
 
-    if not user:
-        return jsonify({'message':'Invalid credentials', 'authenticated':False}), 401
+    if user:
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
 
-    token = jwt.encode({
-        'sub': user.email,
-        'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=30)},
-        app.config['SECRET_KEY'])
-    return jsonify({ 'token': token.decode('UTF-8') })
+        response = jsonify()
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+        return response, 201
+    else:
+        return jsonify(message="Unauthorized"), 401
+
+@app.route('/logout', methods=['POST'])
+@jwt_required
+def logout():
+    response = jsonify()
+    unset_jwt_cookies(response)
+    return response, 200
 
 @app.route('/profile', methods=['GET'])
-@token_required
-def profile(current_user):
-    user = User.query.filter_by(id=current_user).first()
+@jwt_required
+def profile():
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
     return jsonify({'email': user.email})
+
+@app.route('/refresh', methods=['POST'])
+@jwt_refresh_token_required
+def refresh():
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    access_token = create_access_token(identity=user.user_id)
+
+    response = jsonify()
+    set_access_cookies(response, access_token)
+
+    return response, 201
 
 @app.route('/sticker', methods=['GET'])
 def sticker():
