@@ -1,9 +1,13 @@
 import os
 import stripe
+from datetime import datetime, timedelta
+from functools import wraps
 
 from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
+
+import jwt
 
 # config
 DEBUG = True
@@ -23,6 +27,38 @@ with app.app_context():
 
 # CORS init
 CORS(app) # TODO: limit to specific origins
+
+def token_required(f):
+    @wraps(f)
+    def _verify(*args, **kwargs):
+        auth_headers = request.headers.get('Authorization', '').split()
+
+        invalid_msg = {
+            'message': 'Invalid token. Registeration and / or authentication required',
+            'authenticated': False
+        }
+        expired_msg = {
+            'message': 'Expired token. Reauthentication required.',
+            'authenticated': False
+        }
+
+        if len(auth_headers) != 2:
+            return jsonify(invalid_msg), 401
+
+        try:
+            token = auth_headers[1]
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            user = User.query.filter_by(email=data['sub']).first()
+            if not user:
+                raise RuntimeError('User not found')
+            return f(user, *args, **kwargs)
+        except jwt.ExpiredSignatureError:
+            return jsonify(expired_msg), 401
+        except (jwt.InvalidTokenError, Exception) as e:
+            print(e)
+            return jsonify(invalid_msg), 401
+
+    return _verify
 
 # ping test
 @app.route('/ping', methods=['GET'])
@@ -76,6 +112,35 @@ def add_item():
         db.session.commit()
         return redirect(url_for('show_all'))
     return render_template('temp_form.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    user = User(**data)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.to_dict()), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.authenticate(**data)
+
+    if not user:
+        return jsonify({'message':'Invalid credentials', 'authenticated':False}), 401
+
+    token = jwt.encode({
+        'sub': user.email,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(minutes=30)},
+        app.config['SECRET_KEY'])
+    return jsonify({ 'token': token.decode('UTF-8') })
+
+@app.route('/profile', methods=['GET'])
+@token_required
+def profile(current_user):
+    user = User.query.filter_by(id=current_user).first()
+    return jsonify({'email': user.email})
 
 @app.route('/sticker', methods=['GET'])
 def sticker():
