@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Ping from '../components/Ping.vue';
-import Home from '../components/Home.vue'
-import Stickers from '../components/Stickers.vue'
+import Home from '../components/Home.vue';
+import Stickers from '../components/Stickers.vue';
+import Profile from '../components/Profile.vue';
 
 const routes = [
     {
@@ -23,6 +24,11 @@ const routes = [
         path: '/stickers/:id',
         name: "Sticker",
         component: async () => await import('../components/ProductPage.vue')
+    },
+    {
+        path: "/user",
+        name: "User",
+        component: Profile
     },
 ];
 
