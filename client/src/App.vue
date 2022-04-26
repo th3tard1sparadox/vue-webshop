@@ -3,17 +3,19 @@ import Header from './components/Header.vue'
 </script>
 
 <template>
-  <n-space vertical>
-    <n-layout>
-      <n-layout-header bordered>
-        <Header></Header>
-      </n-layout-header>
-      <router-view />
-      <n-layout-footer bordered>
-        hello
-      </n-layout-footer>
-    </n-layout>
-  </n-space>
+  <n-message-provider>
+    <n-space vertical>
+      <n-layout>
+        <n-layout-header bordered>
+          <Header></Header>
+        </n-layout-header>
+        <router-view />
+        <n-layout-footer bordered>
+          hello
+        </n-layout-footer>
+      </n-layout>
+    </n-space>
+  </n-message-provider>
 </template>
 
 <style>
