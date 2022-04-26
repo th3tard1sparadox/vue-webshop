@@ -5,11 +5,13 @@ import Header from './components/Header.vue'
 <template>
   <n-message-provider>
     <n-space vertical>
-      <n-layout>
+      <n-layout style="height: 100vh; display: flex; flex-direction: column;">
         <n-layout-header bordered>
           <Header></Header>
         </n-layout-header>
-        <router-view />
+        <div style="display: flex; justify-content: center; flex: 1 0 auto">
+          <router-view />
+        </div>
         <n-layout-footer bordered>
           hello
         </n-layout-footer>
@@ -25,5 +27,10 @@ import Header from './components/Header.vue'
   margin: 0 auto;
   font-weight: normal;
   height: 100%;
+}
+
+.n-layout-scroll-container {
+  display: flex;
+  flex-direction: column;
 }
 </style>
