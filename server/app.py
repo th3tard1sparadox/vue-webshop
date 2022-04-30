@@ -1,9 +1,13 @@
 import os
 import stripe
+from datetime import datetime, timedelta
+from functools import wraps
 
 from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
+
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, jwt_required, JWTManager, get_jwt_identity
 
 # config
 DEBUG = True
@@ -12,6 +16,13 @@ DEBUG = True
 app = Flask(__name__)
 # app.config.from_object(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./localdb.db'
+app.config['JWT_SECRET_KEY'] = 'abc123'
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_ACCESS_CSRF_HEADER_NAME"] = "X-CSRF-TOKEN-ACCESS"
+app.config["JWT_REFRESH_CSRF_HEADER_NAME"] = "X-CSRF-TOKEN-REFRESH"
+
+# jwt init
+jwt = JWTManager(app)
 
 # stripe init
 stripe.api_key = 'sk_test_51KooyYKZBrT6aoPP4akBLCihOxEzz0K6kOZ9CGW8udYeUwqsxPBjuNYgnx0MKS5576Q6aybqqUtcx8lxLIWyUC7n00Ys7kfscb'
@@ -22,7 +33,7 @@ with app.app_context():
     db.create_all()
 
 # CORS init
-CORS(app) # TODO: limit to specific origins
+CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True) # TODO: limit to specific origins
 
 # ping test
 @app.route('/ping', methods=['GET'])
@@ -76,6 +87,56 @@ def add_item():
         db.session.commit()
         return redirect(url_for('show_all'))
     return render_template('temp_form.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    user = User(**data)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.to_dict()), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.authenticate(**data)
+
+    if user:
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+
+        response = jsonify()
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+        return response, 201
+    else:
+        return jsonify(message="Unauthorized"), 401
+
+@app.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    response = jsonify()
+    unset_jwt_cookies(response)
+    return response, 200
+
+@app.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    return jsonify({'email': user.email})
+
+@app.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    access_token = create_access_token(identity=user.user_id)
+
+    response = jsonify()
+    set_access_cookies(response, access_token)
+
+    return response, 201
 
 @app.route('/sticker', methods=['GET'])
 def sticker():
