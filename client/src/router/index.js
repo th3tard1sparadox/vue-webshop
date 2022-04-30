@@ -3,6 +3,7 @@ import Ping from '../components/Ping.vue';
 import Home from '../components/Home.vue';
 import Stickers from '../components/Stickers.vue';
 import Profile from '../components/Profile.vue';
+import NotFound from '../components/404.vue';
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
         path: "/user",
         name: "User",
         component: Profile
+    },
+    {
+        path: "/404",
+        name: "NotFound",
+        component: NotFound
     },
 ];
 

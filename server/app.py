@@ -17,6 +17,9 @@ app = Flask(__name__)
 # app.config.from_object(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./localdb.db'
 app.config['JWT_SECRET_KEY'] = 'abc123'
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_ACCESS_CSRF_HEADER_NAME"] = "X-CSRF-TOKEN-ACCESS"
+app.config["JWT_REFRESH_CSRF_HEADER_NAME"] = "X-CSRF-TOKEN-REFRESH"
 
 # jwt init
 jwt = JWTManager(app)
@@ -30,7 +33,7 @@ with app.app_context():
     db.create_all()
 
 # CORS init
-CORS(app) # TODO: limit to specific origins
+CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True) # TODO: limit to specific origins
 
 # ping test
 @app.route('/ping', methods=['GET'])

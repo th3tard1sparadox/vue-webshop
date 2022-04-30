@@ -9,7 +9,7 @@ import Header from './components/Header.vue'
         <n-layout-header bordered>
           <Header></Header>
         </n-layout-header>
-        <div style="display: flex; justify-content: center; flex: 1 0 auto">
+        <div style="display: flex; justify-content: center; flex: 1 0 auto; padding: 2rem;">
           <router-view />
         </div>
         <n-layout-footer bordered>
