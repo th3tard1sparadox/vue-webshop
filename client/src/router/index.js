@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Ping from '../components/Ping.vue';
-import Home from '../components/Home.vue';
-import Stickers from '../components/Stickers.vue';
-import Profile from '../components/Profile.vue';
-import NotFound from '../components/404.vue';
+import Ping from '../pages/Ping.vue';
+import Home from '../pages/Home.vue';
+import Stickers from '../pages/Stickers.vue';
+import Profile from '../pages/Profile.vue';
+import NotFound from '../pages/404.vue';
 
 const routes = [
     {
@@ -24,7 +24,7 @@ const routes = [
     {
         path: '/stickers/:id',
         name: "Sticker",
-        component: async () => await import('../components/ProductPage.vue')
+        component: async () => await import('../pages/ProductPage.vue')
     },
     {
         path: "/user",
@@ -33,6 +33,11 @@ const routes = [
     },
     {
         path: "/404",
+        name: "NotFound",
+        component: NotFound
+    },
+    {
+        path: "/:pathMatch(.*)*",
         name: "NotFound",
         component: NotFound
     },

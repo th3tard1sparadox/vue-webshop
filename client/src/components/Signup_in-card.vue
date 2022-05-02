@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import Login from "./Login.vue"
+import Login from "./Signin.vue"
 import Signup from "./Signup.vue"
 
 export default {
-    name: "Signup_in",
+    name: "SignupCard",
     components: { Login, Signup }
 }
 </script>
