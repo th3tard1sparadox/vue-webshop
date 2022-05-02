@@ -1,5 +1,5 @@
 <template>
-    <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start; align-items: center;">
+    <div style="display: flex; flex: 1 0 auto; flex-direction: column; justify-content: flex-start; align-items: center;">
         <n-card style="min-width: 30rem;">
             <n-tabs
                 class="card-tabs"

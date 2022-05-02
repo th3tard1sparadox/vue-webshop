@@ -55,9 +55,11 @@
 <script>
 import { useMessage } from "naive-ui";
 import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     setup() {
+        const router = useRouter();
         const formRef = ref(null);
         const rPasswordFormItemRef = ref(null);
         const message = useMessage();
@@ -80,7 +82,6 @@ export default defineComponent({
                     {
                         required: true,
                         validator(rule, value) {
-                            console.log(value);
                             if(!value) {
                                 return new Error("Email is required");
                             } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) {
@@ -138,11 +139,13 @@ export default defineComponent({
                             },
                             body: JSON.stringify({email: formValueRef.value.user.email, password: formValueRef.value.user.password})
                         });
-                        const gObject = await gResponse.json();
-                        message.success("Valid");
+                        if(gResponse.ok) {
+                            router.go();
+                        } else {
+                            message.error("Signup unsuccessful");
+                        }
                     } else {
-                        console.log(errors);
-                        message.error("Invalid");
+                        message.error("Signup unsuccessful");
                     }
                 })
             }
