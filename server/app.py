@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
 
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, jwt_required, JWTManager, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity
 
 # config
 DEBUG = True

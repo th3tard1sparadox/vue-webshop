@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Ping from '../pages/Ping.vue';
 import Home from '../pages/Home.vue';
 import Stickers from '../pages/Stickers.vue';
 import Profile from '../pages/Profile.vue';
@@ -8,11 +7,6 @@ import SignupCard from '../pages/Signup_in-card.vue';
 import Wishlist from '../pages/Wishlist.vue';
 
 const routes = [
-    {
-        path: '/ping',
-        name: 'Ping',
-        component: Ping
-    },
     {
         path: '/',
         name: 'Home',

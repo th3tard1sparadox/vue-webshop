@@ -7,7 +7,7 @@
 <script>
 import { h, ref } from "vue";
 import { NIcon } from "naive-ui";
-import { Home, Activity, Star, UserAvatar, Favorite } from "@vicons/carbon"; 
+import { Home, Star, UserAvatar, Favorite } from "@vicons/carbon"; 
 
 function renderIcon(icon) {
     return () => h(NIcon, null, {default: () => h(icon) });
@@ -25,12 +25,6 @@ const menuOptions = [
         }, "Stickers"),
         key: "stickers",
         icon: renderIcon(Star)
-    },
-    {label: () => h("a", {
-        href: "http://localhost:3000/ping",
-        }, "Ping"),
-        key: "ping",
-        icon: renderIcon(Activity)
     },
     {label: () => h("a", {
         href: "http://localhost:3000/user",

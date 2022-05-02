@@ -22,7 +22,6 @@
                 v-model:value="formValue.user.password"
                 type="password"
                 placeholder="password"
-                @input="handlePasswordInput"
                 @keydown.enter.prevent
             />
         </n-form-item>
@@ -41,9 +40,11 @@
 <script>
 import { useMessage } from "naive-ui";
 import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     setup() {
+        const router = useRouter();
         const formRef = ref(null);
         const message = useMessage();
         const formValueRef = ref({
@@ -94,14 +95,14 @@ export default defineComponent({
                             credentials: 'include',
                             mode: 'cors'
                         });
-                        if(gResponse.status.ok) {
-                            const gObject = await gResponse.json();
-                            this.$store.commit('setUser', gObject);
-                            message.success("Valid");
+                        if(gResponse.ok) {
+                            router.push('/');
+                        } else {
+                            message.error("Login unsuccessful");
                         }
                     } else {
                         console.log(errors);
-                        message.error("Invalid");
+                        message.error("Login unsuccessful");
                     }
                 })
             }
