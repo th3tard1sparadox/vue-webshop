@@ -96,7 +96,6 @@ export default defineComponent({
                         });
                         if(gResponse.status.ok) {
                             const gObject = await gResponse.json();
-                            console.log(gObject)
                             this.$store.commit('setUser', gObject);
                             message.success("Valid");
                         }

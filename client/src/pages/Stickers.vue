@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import ProductCard from "./ProductCard.vue";
+import ProductCard from "../components/ProductCard.vue";
 
 export default {
     components: {
@@ -22,6 +22,9 @@ export default {
     },
     created: async function() {
         const gResponse = await fetch("http://localhost:5000/products");
+        if(!gResponse.ok) {
+            this.$router.replace('/404');
+        }
         const gObject = await gResponse.json();
         this.products = gObject;
     }
@@ -29,10 +32,4 @@ export default {
 </script>
 
 <style>
-.n-grid {
-    padding-top: 30px;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-bottom: 40px;
-}
 </style>

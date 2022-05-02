@@ -1,15 +1,15 @@
 <template>
     <div class="home">
         <h1>Hello, this will be a homepage soon!</h1>
-        <Signup_in />
+        <SignupCard />
     </div>
 </template>
 
 <script>
-import Signup_in from "./Signup_in.vue"
+import SignupCard from "../components/Signup_in-card.vue"
 
 export default {
     name: "Home",
-    components: { Signup_in }
+    components: { SignupCard }
 }
 </script>

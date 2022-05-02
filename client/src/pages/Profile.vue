@@ -25,6 +25,9 @@ export default {
             mode: 'cors'
             
         });
+        if(!gResponse.ok) {
+            this.$router.replace('/404');
+        }
         const gObject = await gResponse.json();
         console.log(gObject);
     },

@@ -33,6 +33,9 @@ export default {
             },
             body: JSON.stringify(this.$route.params.id)
         });
+        if(!gResponse.ok) {
+            this.$router.replace('/404');
+        }
         const gObject = await gResponse.json();
         this.product = gObject;
     }
