@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import SignupCard from "../components/Signup_in-card.vue"
+import SignupCard from "./Signup_in-card.vue"
 
 export default {
     name: "Home",

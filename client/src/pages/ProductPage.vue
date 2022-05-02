@@ -1,27 +1,56 @@
 <template>
     <n-grid :cols="2">
-        <n-gi>
+        <n-gi style="display: flex; align-items: flex-start; justify-content: center;">
             <n-image
-                width="500"
+                width="300"
+                object-fit="scale-down"
                 :src="product.picture"
             />
         </n-gi>
         <n-gi>
             <n-h1>{{ product.name }}</n-h1>
             <n-h2>{{ product.price }} kr</n-h2>
-            <n-button type="primary">Add to cart</n-button>
+            <n-button tertiary round>Add to cart</n-button>
+            <n-button 
+                tertiary 
+                circle
+                @click="favoriteItem" 
+                style="margin-left: 1rem;"
+            >
+                <n-icon>
+                    <Favorite />
+                </n-icon>
+            </n-button>
             <n-divider />
-            <n-h2>{{ product.desc }}</n-h2>
+            <n-h3>{{ product.desc }}</n-h3>
         </n-gi>
     </n-grid>
 </template>
 
 <script>
+import { Favorite } from "@vicons/carbon";
 export default {
     name: 'ProductPage',
+    components: {
+        Favorite
+    },
     data: function() {
         return {
             product: {}
+        }
+    },
+    methods: {
+        favoriteItem: async function(e) {
+            e.preventDefault();
+            const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.$route.params.id),
+                credentials: 'include',
+                mode: 'cors'
+            });
         }
     },
     created: async function() {
