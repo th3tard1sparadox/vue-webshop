@@ -4,6 +4,8 @@ import Home from '../pages/Home.vue';
 import Stickers from '../pages/Stickers.vue';
 import Profile from '../pages/Profile.vue';
 import NotFound from '../pages/404.vue';
+import SignupCard from '../pages/Signup_in-card.vue';
+import Wishlist from '../pages/Wishlist.vue';
 
 const routes = [
     {
@@ -30,6 +32,16 @@ const routes = [
         path: "/user",
         name: "User",
         component: Profile
+    },
+    {
+        path: "/login",
+        name: "Login",
+        component: SignupCard
+    },
+    {
+        path: "/wishlist",
+        name: "Wishlist",
+        component: Wishlist
     },
     {
         path: "/404",

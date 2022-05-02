@@ -1,21 +1,27 @@
 <template>
-    <div>
-        <p>{{ user }}</p>
-    </div>
+    <n-list bordered>
+        <n-list-item
+            v-for="product in products"
+        >
+            <WishlistItem :name="product.name" :picture="product.picture" :price="product.price" :path="product.path" :id="product.id"/>
+        </n-list-item>
+    </n-list>
 </template>
 
 <script>
-import NotFound from "./404.vue";
+import WishlistItem from "../components/WishlistItem.vue";
 
 export default {
-    name: "Profile",
+    components: {
+        WishlistItem
+    },
     data: function() {
         return {
-            user: ''
+            products: []
         }
     },
     created: async function() {
-        const gResponse = await fetch("http://localhost:5000/profile", {
+        const gResponse = await fetch("http://localhost:5000/wishlist", {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -29,10 +35,7 @@ export default {
             this.$router.replace('/login');
         }
         const gObject = await gResponse.json();
-        console.log(gObject);
-    },
-    components: {
-        NotFound
+        this.products = gObject;
     }
-}
+};
 </script>

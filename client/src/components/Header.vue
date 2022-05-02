@@ -7,7 +7,7 @@
 <script>
 import { h, ref } from "vue";
 import { NIcon } from "naive-ui";
-import { Home, Activity, Star, UserAvatar } from "@vicons/carbon"; 
+import { Home, Activity, Star, UserAvatar, Favorite } from "@vicons/carbon"; 
 
 function renderIcon(icon) {
     return () => h(NIcon, null, {default: () => h(icon) });
@@ -37,6 +37,12 @@ const menuOptions = [
         }, "Profile"),
         key: "profile",
         icon: renderIcon(UserAvatar)
+    },
+    {label: () => h("a", {
+        href: "http://localhost:3000/wishlist",
+        }, "Wishlist"),
+        key: "wishlist",
+        icon: renderIcon(Favorite)
     }
 ]
 
