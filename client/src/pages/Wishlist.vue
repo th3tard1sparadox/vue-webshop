@@ -3,7 +3,7 @@
         <n-list-item
             v-for="product in products"
         >
-            <WishlistItem :name="product.name" :picture="product.picture" :price="product.price" :path="product.path" />
+            <WishlistItem :name="product.name" :picture="product.picture" :price="product.price" :path="product.path" :id="product.id"/>
         </n-list-item>
     </n-list>
 </template>

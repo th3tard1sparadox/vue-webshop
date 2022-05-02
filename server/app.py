@@ -135,6 +135,17 @@ def add_to_wishlist():
     db.session.commit()
     return jsonify(p_id), 200
 
+@app.route('/remove_from_wishlist', methods=['POST'])
+@jwt_required()
+def remove_from_wishlist():
+    user_id = get_jwt_identity()
+    p_id = request.get_json()
+    user = User.query.filter_by(id=user_id).first()
+    product = Item.query.filter_by(id=p_id).first()
+    user.wishes.remove(product)
+    db.session.commit()
+    return jsonify(p_id), 200
+
 @app.route('/wishlist', methods=['GET'])
 @jwt_required()
 def get_wishes():
@@ -148,7 +159,8 @@ def get_wishes():
             'picture': product.picture,
             'desc': product.description,
             'price': product.price,
-            'path': '/stickers/' + str(product.id)
+            'path': '/stickers/' + str(product.id),
+            'id': product.id
         }
     return jsonify(products_response)
 
