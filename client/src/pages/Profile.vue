@@ -3,7 +3,7 @@
         <h1>
             Email: {{ email }}
         </h1>
-        <n-button tertiary round type="error" @click="logout" style="margin-top: 2rem;">
+        <n-button ghost round type="error" @click="logout" style="margin-top: 2rem;">
             Log out
         </n-button>
     </div>

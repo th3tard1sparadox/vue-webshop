@@ -22,7 +22,7 @@
                     circle 
                     size="small"
                     type="error"
-                    tertiary
+                    ghost
                     @click="removeFavorite"
                     style="margin-top: 3px;"
                 >

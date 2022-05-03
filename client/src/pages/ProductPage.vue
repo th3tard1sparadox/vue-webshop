@@ -10,9 +10,15 @@
         <n-gi>
             <n-h1>{{ product.name }}</n-h1>
             <n-h2>{{ product.price }} kr</n-h2>
-            <n-button tertiary round>Add to cart</n-button>
             <n-button 
-                tertiary 
+                ghost 
+                round
+                @click="addProductToCart(product.id)"
+            >
+                Add to cart
+            </n-button>
+            <n-button 
+                ghost
                 circle
                 @click="favoriteItem" 
                 style="margin-left: 1rem;"
@@ -25,14 +31,18 @@
             <n-h3>{{ product.desc }}</n-h3>
         </n-gi>
     </n-grid>
+    <Cart />
 </template>
 
 <script>
+import Cart from "./Cart.vue";
 import { Favorite } from "@vicons/carbon";
+import { mapActions } from "vuex";
 export default {
     name: 'ProductPage',
     components: {
-        Favorite
+        Favorite,
+        Cart
     },
     data: function() {
         return {
@@ -40,6 +50,9 @@ export default {
         }
     },
     methods: {
+        ...mapActions('cart', [
+            'addProductToCart'
+        ]),
         favoriteItem: async function(e) {
             e.preventDefault();
             const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
@@ -67,6 +80,7 @@ export default {
         }
         const gObject = await gResponse.json();
         this.product = gObject;
+        this.$store.dispatch('products/getAllProducts');
     }
 }
 </script>

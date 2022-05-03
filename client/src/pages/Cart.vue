@@ -2,46 +2,49 @@
     <h1 style="margin-bottom: 2rem;">
         Cart overview:
     </h1>
+    {{ products }}
     <n-list bordered>
         <n-list-item
             v-for="product in products"
+            :key="product.id"
         >
             <CartItem :name="product.name" :picture="product.picture" :price="product.price" :path="product.path" :id="product.id"/>
         </n-list-item>
     </n-list>
-    <n-button style="align-self: flex-end; margin-top: 2rem;">
-        Checkout
-    </n-button>
+    <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
+        <h2>
+            Total: {{ total }} kr
+        </h2>
+        <n-button 
+            ghost 
+            round 
+            @click="checkout(products)"
+            :disabled="!checkoutStatus"
+        >
+            Checkout
+        </n-button>
+    </div>
 </template>
 
 <script>
 import CartItem from "../components/CartItem.vue";
+import { mapGetters, mapState } from "vuex";
 
 export default {
     components: {
         CartItem
     },
-    data: function() {
-        return {
-            products: []
-        }
+    computed: {
+        ...mapState({
+            checkoutStatus: state => state.cart.checkoutStatus
+        }),
+        ...mapGetters('cart', {
+            products: 'cartProducts',
+            total: 'cartTotalPrice'
+        })
     },
-    created: async function() {
-        const gResponse = await fetch("http://localhost:5000/wishlist", {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            mode: 'cors'
-            
-        });
-        if(!gResponse.ok) {
-            this.$router.replace('/login');
-        }
-        const gObject = await gResponse.json();
-        this.products = gObject;
+    methods: {
+        checkout (products) {}
     }
 };
 </script>
