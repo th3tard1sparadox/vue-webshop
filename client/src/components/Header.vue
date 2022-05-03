@@ -1,6 +1,6 @@
 <template>
     <div class="header" style="margin-top: 2rem; margin-bottom: 2rem;">
-        <n-badge :value="value">
+        <n-badge :value="quantity">
             <n-menu v-model:value="activeKey" mode="horizontal" :options="menuOptions"/> 
         </n-badge>
     </div>
@@ -49,10 +49,15 @@ const menuOptions = [
 ]
 
 export default {
+    computed: {
+        quantity() {
+            this.$store.commit('updateCartFromLocalStorage');
+            return this.$store.getters.cartQuantity;
+        }
+    },
     setup() {
         return {
             activeKey: ref(null),
-            value: ref(1),
             menuOptions
         };
     },

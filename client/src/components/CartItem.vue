@@ -3,19 +3,20 @@
     <n-thing>
         <template #avatar>
             <n-avatar 
-                :src="picture"
+                :src="product.picture"
                 size="large"
                 @click="productPage"
             />
         </template>
         <template #header>
-            {{ name }}
+            {{ product.name }}
         </template>
         <template #header-extra>
             <div style="display: flex;">
                 <n-input-number 
-                    v-model:value="value"
-                    :min="1"
+                    v-model:value="quantity"
+                    @update:value="setItemQuantity"
+                    :min="0"
                     style="max-width: 6rem; margin-right: 1rem;"
                 />
                 <n-button 
@@ -23,7 +24,7 @@
                     size="small"
                     type="error"
                     ghost
-                    @click="removeFavorite"
+                    @click="removeProduct"
                     style="margin-top: 3px;"
                 >
                     <template #icon>
@@ -33,7 +34,7 @@
             </div>
         </template>
         <template #description>
-            {{ price * value }} kr
+            {{ product.price * quantity }} kr
         </template>
     </n-thing>
 </template>
@@ -47,33 +48,40 @@ export default {
     },
     data: function() {
         return {
-            value: 1
+            product: {},
+            quantity: this.startQuantity
         }
     },
     methods: {
+        setItemQuantity(v) {
+            this.$store.commit('setToCart', {product: this.product, amount: v});
+            this.$router.go();
+        },
+
+        removeProduct() {
+            this.$store.commit('removeCart', this.product);
+            this.$router.go();
+        },
+
         productPage: function (e) {
             this.$router.push(this.path)
-        },
-        removeFavorite: async function(e) {
-            e.preventDefault();
-            const gResponse = await fetch("http://localhost:5000/remove_from_wishlist", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.id),
-                credentials: 'include',
-                mode: 'cors'
-            });
-            this.$router.go();
         }
     },
+    created: async function() {
+        const gResponse = await fetch("http://localhost:5000/products", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.id)
+        });
+        const gObject = await gResponse.json();
+        this.product = gObject;
+    },
     props: [
-        'name',
-        'picture',
-        'price',
-        'path',
-        'id'
+        'id',
+        'startQuantity'
     ]
 }
 </script>
