@@ -14,7 +14,10 @@
             <n-button 
                 circle 
                 size="small"
+                type="error"
+                ghost
                 @click="removeFavorite"
+                style="margin-top: 3px;"
             >
                 <template #icon>
                     <TrashCan />

@@ -23,6 +23,13 @@ import { darkTheme } from 'naive-ui';
   </n-config-provider>
 </template>
 
+<script>
+export default {
+  mounted() {
+    this.$store.commit('updateCartFromLocalStorage');
+  }
+}
+</script>
 <style>
 @import './assets/base.css';
 

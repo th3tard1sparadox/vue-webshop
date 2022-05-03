@@ -51,7 +51,8 @@ def get_obj():
                 'picture': product.picture,
                 'desc': product.description,
                 'price': product.price,
-                'path': '/stickers/' + str(product.id)
+                'path': '/stickers/' + str(product.id),
+                'id': product.id
             }
         return jsonify(products_response)
     elif request.method == 'POST':
@@ -62,6 +63,8 @@ def get_obj():
                 'picture': product.picture,
                 'desc': product.description,
                 'price': product.price,
+                'path': '/stickers/' + str(product.id),
+                'id': product.id
             })
 
 @app.route('/', methods=['GET'])

@@ -10,9 +10,15 @@
         <n-gi>
             <n-h1>{{ product.name }}</n-h1>
             <n-h2>{{ product.price }} kr</n-h2>
-            <n-button tertiary round>Add to cart</n-button>
             <n-button 
-                tertiary 
+                ghost 
+                round
+                @click="addToCart()"
+            >
+                Add to cart
+            </n-button>
+            <n-button 
+                ghost
                 circle
                 @click="favoriteItem" 
                 style="margin-left: 1rem;"
@@ -29,10 +35,11 @@
 
 <script>
 import { Favorite } from "@vicons/carbon";
+
 export default {
     name: 'ProductPage',
     components: {
-        Favorite
+        Favorite,
     },
     data: function() {
         return {
@@ -40,6 +47,9 @@ export default {
         }
     },
     methods: {
+        addToCart() {
+            this.$store.commit('addToCart', this.product);
+        },
         favoriteItem: async function(e) {
             e.preventDefault();
             const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
