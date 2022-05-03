@@ -5,6 +5,7 @@ import Profile from '../pages/Profile.vue';
 import NotFound from '../pages/404.vue';
 import SignupCard from '../pages/Signup_in-card.vue';
 import Wishlist from '../pages/Wishlist.vue';
+import Cart from '../pages/Cart.vue';
 
 const routes = [
     {
@@ -36,6 +37,11 @@ const routes = [
         path: "/wishlist",
         name: "Wishlist",
         component: Wishlist
+    },
+    {
+        path: "/cart",
+        name: "Cart",
+        component: Cart
     },
     {
         path: "/404",

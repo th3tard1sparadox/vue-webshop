@@ -1,3 +1,4 @@
+
 <template>
     <n-thing>
         <template #avatar>
@@ -11,20 +12,28 @@
             {{ name }}
         </template>
         <template #header-extra>
-            <n-button 
-                circle 
-                size="small"
-                type="error"
-                tertiary
-                @click="removeFavorite"
-            >
-                <template #icon>
-                    <TrashCan />
-                </template>
-            </n-button>
+            <div style="display: flex;">
+                <n-input-number 
+                    v-model:value="value"
+                    :min="1"
+                    style="max-width: 6rem; margin-right: 1rem;"
+                />
+                <n-button 
+                    circle 
+                    size="small"
+                    type="error"
+                    tertiary
+                    @click="removeFavorite"
+                    style="margin-top: 3px;"
+                >
+                    <template #icon>
+                        <TrashCan />
+                    </template>
+                </n-button>
+            </div>
         </template>
         <template #description>
-            {{ price }} kr
+            {{ price * value }} kr
         </template>
     </n-thing>
 </template>
@@ -35,6 +44,11 @@ import { TrashCan } from "@vicons/carbon";
 export default {
     components: {
         TrashCan
+    },
+    data: function() {
+        return {
+            value: 1
+        }
     },
     methods: {
         productPage: function (e) {
