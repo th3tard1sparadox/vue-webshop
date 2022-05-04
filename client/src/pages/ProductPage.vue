@@ -49,6 +49,7 @@ export default {
     methods: {
         addToCart() {
             this.$store.commit('addToCart', this.product);
+            this.$emit('cartChange');
         },
         favoriteItem: async function(e) {
             e.preventDefault();

@@ -7,7 +7,7 @@
             v-for="product in products"
             :key="product.id"
         >
-            <CartItem :id="product.id" :startQuantity="product.quantity" />
+            <CartItem :id="product.id" :startQuantity="product.quantity" @cartChange="updateCart" />
         </n-list-item>
     </n-list>
     <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
@@ -27,15 +27,22 @@
 import CartItem from "../components/CartItem.vue";
 
 export default {
+    data: () => ({
+        products: [],
+        total: 0
+    }),
     components: {
         CartItem
     },
-    computed: {
-        products() {
-            return this.$store.getters.cartItems;
-        },
-        total() {
-            return this.$store.getters.total;
+    created: function () {
+        this.products = this.$store.getters.cartItems;
+        this.total = this.$store.getters.total;
+    },
+    methods: {
+        updateCart: function() {
+            this.products = this.$store.getters.cartItems;
+            this.total = this.$store.getters.total;
+            this.$emit('cartChange');
         }
     }
 };
