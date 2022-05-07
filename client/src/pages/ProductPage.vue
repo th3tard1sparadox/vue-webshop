@@ -1,10 +1,11 @@
 <template>
-    <n-grid :cols="2">
+    <n-grid cols="1 m:2" responsive="screen">
         <n-gi style="display: flex; align-items: flex-start; justify-content: center;">
             <n-image
                 width="300"
                 object-fit="scale-down"
                 :src="product.picture"
+                style="padding-bottom: 2rem;"
             />
         </n-gi>
         <n-gi>
@@ -35,8 +36,11 @@
 
 <script>
 import { Favorite } from "@vicons/carbon";
+import { NIcon, useMessage } from "naive-ui";
+import { defineComponent, h } from "vue";
+import { useRouter } from "vue-router";
 
-export default {
+export default defineComponent({
     name: 'ProductPage',
     components: {
         Favorite,
@@ -49,19 +53,30 @@ export default {
     methods: {
         addToCart() {
             this.$store.commit('addToCart', this.product);
+            this.$emit('cartChange');
         },
-        favoriteItem: async function(e) {
-            e.preventDefault();
-            const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.$route.params.id),
-                credentials: 'include',
-                mode: 'cors'
-            });
+    },
+    setup() {
+        const message = useMessage();
+        const router = useRouter();
+        return {
+            favoriteItem: async function(e) {
+                message.error("Added to wishlist", {
+                    icon: () => h(NIcon, null, { default: () => h(Favorite) })
+                });
+                e.preventDefault();
+                const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(router.currentRoute._value.params.id),
+                    credentials: 'include',
+                    mode: 'cors'
+                });
+            }
         }
+
     },
     created: async function() {
         const gResponse = await fetch("http://localhost:5000/products", {
@@ -78,5 +93,5 @@ export default {
         const gObject = await gResponse.json();
         this.product = gObject;
     }
-}
+})
 </script>

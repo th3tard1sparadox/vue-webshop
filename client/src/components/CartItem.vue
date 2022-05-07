@@ -55,16 +55,16 @@ export default {
     methods: {
         setItemQuantity(v) {
             this.$store.commit('setToCart', {product: this.product, amount: v});
-            this.$router.go();
+            this.$emit('cartChange');
         },
 
         removeProduct() {
             this.$store.commit('removeCart', this.product);
-            this.$router.go();
+            this.$emit('cartChange');
         },
 
         productPage: function (e) {
-            this.$router.push(this.path)
+            this.$router.push(this.product.path);
         }
     },
     created: async function() {

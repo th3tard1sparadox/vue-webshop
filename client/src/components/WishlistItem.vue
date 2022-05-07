@@ -52,7 +52,7 @@ export default {
                 credentials: 'include',
                 mode: 'cors'
             });
-            this.$router.go();
+            this.$emit('updateList');
         }
     },
     props: [

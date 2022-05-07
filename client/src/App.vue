@@ -9,10 +9,10 @@ import { darkTheme } from 'naive-ui';
       <n-space vertical>
         <n-layout style="height: 100vh; display: flex; flex-direction: column;">
           <n-layout-header bordered>
-            <Header></Header>
+            <Header :key="update" />
           </n-layout-header>
           <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start;">
-            <router-view />
+            <router-view @cartChange="updateCart" />
           </div>
           <n-layout-footer bordered>
             hello
@@ -25,6 +25,16 @@ import { darkTheme } from 'naive-ui';
 
 <script>
 export default {
+  data () {
+    return {
+      update: 0
+    };
+  },
+  methods: {
+    updateCart() {
+      this.update++;
+    }
+  },
   mounted() {
     this.$store.commit('updateCartFromLocalStorage');
   }

@@ -1,5 +1,7 @@
 <template>
-    <div class="header" style="margin-top: 2rem; margin-bottom: 2rem;">
+    <div class="header" 
+        style="margin-top: 2rem; margin-bottom: 2rem; display: flex; justify-content: center;"
+    >
         <n-badge :value="quantity">
             <n-menu v-model:value="activeKey" mode="horizontal" :options="menuOptions"/> 
         </n-badge>
