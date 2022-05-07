@@ -64,7 +64,7 @@ export default {
         },
 
         productPage: function (e) {
-            this.$router.push(this.path)
+            this.$router.push(this.product.path);
         }
     },
     created: async function() {
