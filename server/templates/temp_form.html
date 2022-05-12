@@ -10,6 +10,12 @@
       <form action = "{{ request.path }}" method = "post">
          <label for = "name">Name</label><br>
          <input type = "text" name = "name" placeholder = "Name" /><br>
+         <label for = "description">Description</label><br>
+         <input type = "text" name = "description" /><br>
+         <label for = "price">Price</label><br>
+         <input type = "number" name = "price" min = "100" /><br>
+         <label for = "picture">Picture link</label><br>
+         <input type = "text" name = "picture" /><br>
          <label for = "quantity">Quantity</label><br>
          <input type = "number" name = "quantity" min = "1" /><br>
          <label for = "displayed">Displayed</label><br>

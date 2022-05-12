@@ -18,6 +18,7 @@ These are the technological specifications for this project, mainly consisting o
 - **Programing languages** - JavaScript and Python are the main ones that are planned to be used.
 - **Client framework** - Vue is the framework that is going to be used as it lands within my experience level.
 - **Server framework** - Flask is planned to be used as the backend framework, although Django is the backup plan if it turns out that Flask wasn't the appropriate choice.
+- **Other technologies** - Naive UI will be used for frontend design. Although Bootstrap was considered it doesn't currently support vue 3, which is why Naive UI was chosen instead.
 
 ## Usage
 

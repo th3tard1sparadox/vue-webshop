@@ -1,66 +1,56 @@
+<script setup>
+import Header from './components/Header.vue';
+import { darkTheme } from 'naive-ui';
+</script>
+
 <template>
-  <router-view />
+  <n-config-provider :theme="darkTheme">
+    <n-message-provider>
+      <n-space vertical>
+        <n-layout style="height: 100vh; display: flex; flex-direction: column;">
+          <n-layout-header bordered>
+            <Header :key="update" />
+          </n-layout-header>
+          <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start;">
+            <router-view @cartChange="updateCart" />
+          </div>
+          <n-layout-footer bordered>
+            hello
+          </n-layout-footer>
+        </n-layout>
+      </n-space>
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
+<script>
+export default {
+  data () {
+    return {
+      update: 0
+    };
+  },
+  methods: {
+    updateCart() {
+      this.update++;
+    }
+  },
+  mounted() {
+    this.$store.commit('updateCartFromLocalStorage');
+  }
+}
+</script>
 <style>
 @import './assets/base.css';
 
 #app {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-
   font-weight: normal;
+  height: 100%;
 }
 
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.n-layout-scroll-container {
+  display: flex;
+  flex-direction: column;
 }
 </style>
