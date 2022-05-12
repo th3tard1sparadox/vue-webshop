@@ -17,14 +17,18 @@ app = Flask(__name__)
 # app.config.from_object(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./localdb.db'
 app.config['JWT_SECRET_KEY'] = 'abc123'
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 # jwt init
 jwt = JWTManager(app)
 
 # stripe init
-stripe.api_key = 'sk_test_51KooyYKZBrT6aoPP4akBLCihOxEzz0K6kOZ9CGW8udYeUwqsxPBjuNYgnx0MKS5576Q6aybqqUtcx8lxLIWyUC7n00Ys7kfscb'
+stripe_keys = {
+    'secret_key': 'sk_test_51KooyYKZBrT6aoPP4akBLCihOxEzz0K6kOZ9CGW8udYeUwqsxPBjuNYgnx0MKS5576Q6aybqqUtcx8lxLIWyUC7n00Ys7kfscb',
+    'publishable_key': 'pk_test_51KooyYKZBrT6aoPPcJXpMc0Yfw1djwju0OdtEeR1LmA1AxySmsWKBIhvbpq1R26SqKfj2EYrujqIug4E7iiHh0mM00NsBFiTGI',
+}
+stripe.api_key = stripe_keys['secret_key']
 
 # database init
 db.init_app(app)
@@ -38,6 +42,12 @@ CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_head
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong')
+
+# stripe keys
+@app.route('/get_key', methods=['GET'])
+def get_publishable_key():
+    stripe_config = {'publicKey': stripe_keys['publishable_key']}
+    return jsonify(stripe_config)
 
 @app.route('/products', methods=['GET', 'POST'])
 def get_obj():
@@ -167,41 +177,26 @@ def get_wishes():
         }
     return jsonify(products_response)
 
-@app.route('/refresh', methods=['POST'])
-@jwt_required(refresh=True)
-def refresh():
-    user_id = get_jwt_identity()
-    user = User.query.filter_by(id=user_id).first()
-    access_token = create_access_token(identity=user.user_id)
-
-    response = jsonify()
-    set_access_cookies(response, access_token)
-
-    return response, 201
-
 @app.route('/sticker', methods=['GET'])
 def sticker():
     return render_template('checkout.html')
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
+    cart = request.get_json()
     session = stripe.checkout.Session.create(
-        line_items=[{
-            'price_data': {
+        line_items = [{
+                'name': item['name'],
+                'quantity': item['quantity'],
                 'currency': 'sek',
-                'product_data': {
-                    'name': 'sticker',
-                },
-                'unit_amount': 500000,
-            },
-            'quantity': 1,
-        }],
+                'amount': item['price'] * 100,
+            } for item in cart],
         mode='payment',
-        success_url='https://localhost:3000/',
-        cancel_url='https://localhost:3000/ping',
+        success_url='http://localhost:3000/',
+        cancel_url='http://localhost:3000/ping',
     )
 
-    return redirect(session.url, code=303)
+    return jsonify({'sessionId': session['id']})
 
 if __name__ == '__main__':
     app.run(port=4242)
