@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
 
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
 
 # config
 DEBUG = True
@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./localdb.db'
 app.config['JWT_SECRET_KEY'] = 'abc123'
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 # jwt init
@@ -33,6 +34,22 @@ with app.app_context():
 
 # CORS init
 CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
+
+# refresh jwt token
+@app.after_request
+def refresh_expiring_jwt(response):
+    try:
+        time = get_jwt()["exp"]
+        now = datetime.now()
+        target = datetime.timestamp(now + timedelta(minutes=30))
+        if target > time:
+            user_id = get_jwt_identity()
+            user = User.query.filter_by(id=user_id).first()
+            access_token = create_access_token(identity=user.id)
+            set_access_cookies(response, access_token)
+        return response
+    except (RuntimeError, KeyError):
+        return response
 
 # ping test
 @app.route('/ping', methods=['GET'])
@@ -104,11 +121,8 @@ def login():
 
     if user:
         access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
-
         response = jsonify()
         set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
         return response, 201
     else:
         return jsonify(message="Unauthorized"), 401
@@ -166,18 +180,6 @@ def get_wishes():
             'id': product.id
         }
     return jsonify(products_response)
-
-@app.route('/refresh', methods=['POST'])
-@jwt_required(refresh=True)
-def refresh():
-    user_id = get_jwt_identity()
-    user = User.query.filter_by(id=user_id).first()
-    access_token = create_access_token(identity=user.user_id)
-
-    response = jsonify()
-    set_access_cookies(response, access_token)
-
-    return response, 201
 
 @app.route('/sticker', methods=['GET'])
 def sticker():
