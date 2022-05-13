@@ -50,6 +50,7 @@ export default {
             this.$emit('cartChange');
         }, 
         checkout: async function() {
+            this.$store.commit('setPayed');
             const gResponse = await fetch("http://localhost:5000/create-checkout-session", {
                 method: 'POST',
                 headers: {
@@ -58,7 +59,12 @@ export default {
                 body: JSON.stringify(this.$store.getters.cartItems),
                 mode: 'cors'
             })
-                .then((result) => result.json())
+                .then((result) => {
+                    if(!result.ok){
+                        this.$router.push('/cancel');
+                    }
+                    return result.json();
+                })
                 .then((data) => {
                     return this.stripe.redirectToCheckout({ sessionId: data.sessionId });
                 });

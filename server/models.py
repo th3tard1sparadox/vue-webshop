@@ -46,8 +46,10 @@ class Item(db.Model):
     picture = db.Column('item_picture', db.String(200)) # link to picture
     quantity = db.Column('quantity', db.Integer, nullable=False)
     displayed = db.Column('displayed', db.Boolean)
+    reserved = db.Column('reserved', db.Integer)
 
     def __init__(self, name, description, price, picture, quantity=0, displayed=False):
+        self.reserved = 0
         self.name = name
         self.quantity = quantity
         self.displayed = displayed
@@ -55,14 +57,18 @@ class Item(db.Model):
         self.price = price
         self.picture = picture
 
+    def increase_reserved(self, q):
+        self.reserved += q
+
     def increase_quantity(self, q):
         self.quantity = self.quantity + q
 
     def decrease_quantity(self, q=1):
-        new_q = self.quantity - q
-        if new_q < 0:
-            return 'quantity too low' #TODO: real error handling
-        self.quantity = new_q
+        # sanity checks are made outside of database
+        self.quantity -= q
+        self.reserved -= q
+        if(self.quantity == 0):
+            self.displayed = False
 
     def set_display(self):
         self.displayed = true

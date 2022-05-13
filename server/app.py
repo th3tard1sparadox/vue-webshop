@@ -184,6 +184,17 @@ def sticker():
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     cart = request.get_json()
+    items = [{'id': i['id'], 'quantity': i['quantity']} for i in cart]
+    for i in items:
+        item = Item.query.filter_by(id=i['id']).first()
+        if(item.quantity < i['quantity']):
+            return jsonify('stock too low'), 400
+
+    for i in items:
+        item = Item.query.filter_by(id=i['id']).first()
+        item.increase_reserved(i['quantity'])
+    db.session.commit()
+
     session = stripe.checkout.Session.create(
         line_items = [{
                 'name': item['name'],
@@ -197,6 +208,15 @@ def create_checkout_session():
     )
 
     return jsonify({'sessionId': session['id']})
+
+@app.route('/decrease_stock', methods=['POST'])
+def decrease_stock():
+    cart = request.get_json()
+    for i in cart:
+        item = Item.query.filter_by(id=i['id']).first()
+        item.decrease_quantity(i['quantity'])
+    db.session.commit()
+    return jsonify(), 200
 
 if __name__ == '__main__':
     app.run(port=4242)
