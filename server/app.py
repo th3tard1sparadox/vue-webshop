@@ -25,7 +25,11 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 jwt = JWTManager(app)
 
 # stripe init
-stripe.api_key = 'sk_test_51KooyYKZBrT6aoPP4akBLCihOxEzz0K6kOZ9CGW8udYeUwqsxPBjuNYgnx0MKS5576Q6aybqqUtcx8lxLIWyUC7n00Ys7kfscb'
+stripe_keys = {
+    'secret_key': 'sk_test_51KooyYKZBrT6aoPP4akBLCihOxEzz0K6kOZ9CGW8udYeUwqsxPBjuNYgnx0MKS5576Q6aybqqUtcx8lxLIWyUC7n00Ys7kfscb',
+    'publishable_key': 'pk_test_51KooyYKZBrT6aoPPcJXpMc0Yfw1djwju0OdtEeR1LmA1AxySmsWKBIhvbpq1R26SqKfj2EYrujqIug4E7iiHh0mM00NsBFiTGI',
+}
+stripe.api_key = stripe_keys['secret_key']
 
 # database init
 db.init_app(app)
@@ -55,6 +59,12 @@ def refresh_expiring_jwt(response):
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong')
+
+# stripe keys
+@app.route('/get_key', methods=['GET'])
+def get_publishable_key():
+    stripe_config = {'publicKey': stripe_keys['publishable_key']}
+    return jsonify(stripe_config)
 
 @app.route('/products', methods=['GET', 'POST'])
 def get_obj():
@@ -187,23 +197,40 @@ def sticker():
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
+    cart = request.get_json()
+    items = [{'id': i['id'], 'quantity': i['quantity']} for i in cart]
+    for i in items:
+        item = Item.query.filter_by(id=i['id']).first()
+        if(item.quantity < i['quantity']):
+            return jsonify('stock too low'), 400
+
+    for i in items:
+        item = Item.query.filter_by(id=i['id']).first()
+        item.increase_reserved(i['quantity'])
+    db.session.commit()
+
     session = stripe.checkout.Session.create(
-        line_items=[{
-            'price_data': {
+        line_items = [{
+                'name': item['name'],
+                'quantity': item['quantity'],
                 'currency': 'sek',
-                'product_data': {
-                    'name': 'sticker',
-                },
-                'unit_amount': 500000,
-            },
-            'quantity': 1,
-        }],
+                'amount': item['price'] * 100,
+            } for item in cart],
         mode='payment',
-        success_url='https://localhost:3000/',
-        cancel_url='https://localhost:3000/ping',
+        success_url='http://localhost:3000/success',
+        cancel_url='http://localhost:3000/cancel',
     )
 
-    return redirect(session.url, code=303)
+    return jsonify({'sessionId': session['id']})
+
+@app.route('/decrease_stock', methods=['POST'])
+def decrease_stock():
+    cart = request.get_json()
+    for i in cart:
+        item = Item.query.filter_by(id=i['id']).first()
+        item.decrease_quantity(i['quantity'])
+    db.session.commit()
+    return jsonify(), 200
 
 if __name__ == '__main__':
     app.run(port=4242)
