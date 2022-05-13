@@ -6,6 +6,8 @@ import NotFound from '../pages/404.vue';
 import SignupCard from '../pages/Signup_in-card.vue';
 import Wishlist from '../pages/Wishlist.vue';
 import Cart from '../pages/Cart.vue';
+import Success from '../pages/Success.vue';
+import Cancel from '../pages/Cancel.vue';
 
 const routes = [
     {
@@ -42,6 +44,16 @@ const routes = [
         path: "/cart",
         name: "Cart",
         component: Cart
+    },
+    {
+        path: "/success",
+        name: "Success",
+        component: Success
+    },
+    {
+        path: "/cancel",
+        name: "Cancel",
+        component: Cancel
     },
     {
         path: "/404",

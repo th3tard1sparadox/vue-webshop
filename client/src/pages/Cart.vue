@@ -60,12 +60,7 @@ export default {
             })
                 .then((result) => result.json())
                 .then((data) => {
-                    console.log(data);
-                    // Redirect to Stripe Checkout
                     return this.stripe.redirectToCheckout({ sessionId: data.sessionId });
-                })
-                .then((res) => {
-                    console.log(res);
                 });
         },
         getStripePublishableKey: async function() {

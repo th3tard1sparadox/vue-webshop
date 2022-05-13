@@ -76,6 +76,11 @@ export default createStore({
       updateLocalStorage(state.cart);
     },
 
+    clearCart (state) {
+      state.cart = [];
+      updateLocalStorage(state.cart);
+    },
+
     updateCartFromLocalStorage(state) {
       const cart = localStorage.getItem('cart');
       if(cart) {

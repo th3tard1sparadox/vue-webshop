@@ -192,8 +192,8 @@ def create_checkout_session():
                 'amount': item['price'] * 100,
             } for item in cart],
         mode='payment',
-        success_url='http://localhost:3000/',
-        cancel_url='http://localhost:3000/ping',
+        success_url='http://localhost:3000/success',
+        cancel_url='http://localhost:3000/cancel',
     )
 
     return jsonify({'sessionId': session['id']})
