@@ -7,7 +7,9 @@ from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
 
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
+
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 # config
 DEBUG = True
@@ -38,6 +40,9 @@ with app.app_context():
 
 # CORS init
 CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
+
+# socket init
+socketio = SocketIO(app, async_handlers=True)
 
 # refresh jwt token
 @app.after_request
@@ -232,5 +237,35 @@ def decrease_stock():
     db.session.commit()
     return jsonify(), 200
 
+@socketio.on('join')
+def connented(data):
+    user = data['user']
+    cart_id = data['cart_id']
+    join_room(cart_id)
+    send(user + ' joined cart', to=cart_id)
+
+@socketio.on('leave')
+def disconnented(data):
+    user = data['user']
+    cart_id = data['cart_id']
+    leave_room(cart_id)
+    send(user + ' left cart', to=cart_id)
+
+@socketio.on('update cart')
+def handel_cart_update(data):
+    cart_id = data['cart_id']
+    cart = data['cart']
+    send(cart, to=cart_id)
+
+@socketio.on('checkout cart')
+def handel_cart_update(data):
+    cart_id = data['cart_id']
+    emit('cart checked out', to=cart_id)
+
+@socketio.on('close cart')
+def handel_cart_update(data):
+    cart_id = data['cart_id']
+    emit('cart closed', to=cart_id)
+
 if __name__ == '__main__':
-    app.run(port=4242)
+    socketio.run(app)
