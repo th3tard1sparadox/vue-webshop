@@ -1,16 +1,22 @@
 import { createStore } from 'vuex'
 
-function updateLocalStorage(cart, p) {
+function updateLocalStorage(cart, p, group) {
   localStorage.setItem('cart', JSON.stringify(cart));
   localStorage.setItem('payed', p);
+  localStorage.setItem('groupCart', group);
 }
 
 export default createStore({
   state: {
     cart: [],
-    payed: false
+    payed: false,
+    groupCart: -1
   },
   getters: {
+    groupCart: state => {
+      return state.groupCart;
+    },
+
     payedStatus: state => {
       return state.payed;
     },
@@ -28,14 +34,19 @@ export default createStore({
     }
   },
   mutations: {
+    setGroupCart(state, groupCart) {
+      state.groupCart = groupCart;
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
+    },
+
     setPayed (state) {
       state.payed = true;
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     unsetPayed (state) {
       state.payed = false;
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     addToCart (state, product) {
@@ -47,7 +58,12 @@ export default createStore({
         state.cart.push({...product, quantity: 1});
       }
 
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
+    },
+
+    setCart (state, cart) {
+      state.cart = cart;
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     setToCart (state, payload) {
@@ -65,7 +81,7 @@ export default createStore({
         }
       }
 
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     decreaseCart (state, product) {
@@ -79,7 +95,7 @@ export default createStore({
         }
       }
 
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     removeCart (state, product) {
@@ -89,21 +105,29 @@ export default createStore({
         state.cart = state.cart.filter(i => i.id !== product.id);
       }
 
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     clearCart (state) {
       state.cart = [];
-      updateLocalStorage(state.cart, state.payed);
+      updateLocalStorage(state.cart, state.payed, state.groupCart);
     },
 
     updateCartFromLocalStorage(state) {
+      const groupCart = localStorage.getItem('groupCart');
       const payed = localStorage.getItem('payed');
       const cart = localStorage.getItem('cart');
       if(cart) {
         state.cart = JSON.parse(cart);
       }
       state.payed = payed;
+      if(state.payed == null) {
+        state.payed = false;
+      }
+      state.groupCart = groupCart;
+      if(state.groupCart == null) {
+        state.groupCart = -1;
+      }
     }
   }
 })

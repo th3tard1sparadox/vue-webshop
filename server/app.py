@@ -9,7 +9,7 @@ from models import *
 
 from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
 
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
 
 # config
 DEBUG = True
@@ -39,10 +39,12 @@ with app.app_context():
     db.create_all()
 
 # CORS init
-CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
+CORS(app, origins=["http://localhost:3000", "http://localhost:5000", "ws://localhost:5000", "ws://localhost:3000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
 
 # socket init
-socketio = SocketIO(app, async_handlers=True)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+carts = {}
 
 # refresh jwt token
 @app.after_request
@@ -154,7 +156,7 @@ def logout():
 def profile():
     user_id = get_jwt_identity()
     user = User.query.filter_by(id=user_id).first()
-    return jsonify({'email': user.email}), 200
+    return jsonify({'email': user.email, 'id': user_id}), 200
 
 @app.route('/add_to_wishlist', methods=['POST'])
 @jwt_required()
@@ -237,34 +239,75 @@ def decrease_stock():
     db.session.commit()
     return jsonify(), 200
 
-@socketio.on('join')
+@socketio.on('connectToGroup')
 def connented(data):
-    user = data['user']
-    cart_id = data['cart_id']
+    cart_id = int(data['cart_id'])
+    print(cart_id)
     join_room(cart_id)
-    send(user + ' joined cart', to=cart_id)
+    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+
+@socketio.on('createGroup')
+def connented(data):
+    cart_id = int(data['cart_id'])
+    carts[cart_id] = []
+    print(carts[cart_id])
+    join_room(cart_id)
 
 @socketio.on('leave')
 def disconnented(data):
     user = data['user']
-    cart_id = data['cart_id']
+    cart_id = int(data['cart_id'])
     leave_room(cart_id)
     send(user + ' left cart', to=cart_id)
 
-@socketio.on('update cart')
+@socketio.on('updateCart')
 def handel_cart_update(data):
-    cart_id = data['cart_id']
+    cart_id = int(data['cart_id'])
     cart = data['cart']
-    send(cart, to=cart_id)
+    print(cart)
+    emit('updateGroupCart', {'cart': cart}, to=cart_id)
+
+@socketio.on('addToCart')
+def handel_cart_add(data):
+    cart_id = int(data['cart_id'])
+    item = data['item']
+
+    added = False
+    for i in carts[cart_id]:
+        if i['id'] == item['id']:
+            i['quantity'] += item['quantity']
+            added = True
+            break
+    if not added:
+        carts[cart_id].append(item)
+
+    print(carts)
+    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+
+@socketio.on('removeFromCart')
+def handel_cart_remove(data):
+    cart_id = int(data['cart_id'])
+    item = data['item']
+
+    for i in carts[cart_id]:
+        if i['id'] == item['id']:
+            if item['quantity'] >= i['quantity']:
+                carts[cart_id].remove(i)
+            else:
+                i['quantity'] -= item['quantity']
+            break
+
+    print(carts)
+    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
 
 @socketio.on('checkout cart')
 def handel_cart_update(data):
-    cart_id = data['cart_id']
+    cart_id = int(data['cart_id'])
     emit('cart checked out', to=cart_id)
 
 @socketio.on('close cart')
 def handel_cart_update(data):
-    cart_id = data['cart_id']
+    cart_id = int(data['cart_id'])
     emit('cart closed', to=cart_id)
 
 if __name__ == '__main__':

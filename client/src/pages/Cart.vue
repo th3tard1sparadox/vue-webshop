@@ -7,7 +7,7 @@
             v-for="product in products"
             :key="product.id"
         >
-            <CartItem :id="product.id" :startQuantity="product.quantity" @cartChange="updateCart" />
+            <CartItem :id="product.id" :startQuantity="product.quantity" @removeFromCart="removeFromCart" @addToCart="addToCart" />
         </n-list-item>
     </n-list>
     <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
@@ -44,10 +44,16 @@ export default {
         this.getStripePublishableKey();
     },
     methods: {
-        updateCart: function() {
+        removeFromCart(i) {
+            console.log('remove in Cart.vue')
             this.products = this.$store.getters.cartItems;
             this.total = this.$store.getters.total;
-            this.$emit('cartChange');
+            this.$emit('removeFromCart', i);
+        }, 
+        addToCart(i) {
+            this.products = this.$store.getters.cartItems;
+            this.total = this.$store.getters.total;
+            this.$emit('addToCart', i);
         }, 
         checkout: async function() {
             this.$store.commit('setPayed');
