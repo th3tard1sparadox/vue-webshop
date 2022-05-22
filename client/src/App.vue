@@ -12,7 +12,7 @@ import { darkTheme } from 'naive-ui';
             <Header :key="update" />
           </n-layout-header>
           <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start;">
-            <router-view @cartChange="updateCart" @openCart="createGroup" @joinGroup="connectToGroup" @addToCart="addToCart" @removeFromCart="removeFromCart" />
+            <router-view :key="update" @cartChange="updateCart" @openCart="createGroup" @joinGroup="connectToGroup" @addToCart="addToCart" @removeFromCart="removeFromCart" />
           </div>
           <n-layout-footer bordered>
             hello
@@ -38,14 +38,20 @@ export default {
       }
     },
     updateGroupCart(cart) {
-      this.update++;
       this.$store.commit('setCart', cart['cart']);
+      this.update++;
+    },
+    checkoutGroupCart() {
+      this.$store.commit('clearCart');
+      this.$store.commit('setGroupCart', -1);
+      if(this.$store.getters.checkout != true) {
+        this.update++;
+      }
     }
   },
   methods: {
     updateCart() {
       this.update++;
-      console.log('hello')
       if(this.$store.getters.groupCart != -1) {
         this.connectToGroup(this.$store.getters.groupCart);
       }
@@ -86,9 +92,7 @@ export default {
         cart_id: gObject['id']
       });
       this.$store.commit('setGroupCart', gObject['id']);
-    },
-    closeCart() {},
-    checkoutCart() {}
+    }
   },
   mounted() {
     this.$store.commit('updateCartFromLocalStorage');

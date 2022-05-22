@@ -10,7 +10,7 @@ export default {
     },
     methods: {
         decrease_stock: async function () {
-            console.log(this.$store.getters.payedStatus);
+            this.$store.commit('setCheckout', false);
             if(this.$store.getters.payedStatus) {
                 const gResponse = await fetch("http://localhost:5000/decrease_stock", {
                     method: 'POST',

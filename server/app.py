@@ -300,15 +300,10 @@ def handel_cart_remove(data):
     print(carts)
     emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
 
-@socketio.on('checkout cart')
+@socketio.on('checkoutCart')
 def handel_cart_update(data):
     cart_id = int(data['cart_id'])
-    emit('cart checked out', to=cart_id)
-
-@socketio.on('close cart')
-def handel_cart_update(data):
-    cart_id = int(data['cart_id'])
-    emit('cart closed', to=cart_id)
+    emit('checkoutGroupCart', to=cart_id)
 
 if __name__ == '__main__':
     socketio.run(app)
