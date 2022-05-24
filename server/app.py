@@ -245,8 +245,7 @@ def connented(data):
     print(cart_id)
     if cart_id in carts:
         join_room(cart_id)
-        emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
-        return 200
+        return carts[cart_id]
     else:
         return 400
 

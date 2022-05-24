@@ -39,7 +39,7 @@ export default {
     updateGroupCart(cart) {
       this.$store.commit('setCart', cart['cart']);
       this.updateHeader++;
-      this.updateBody++;
+      this.bodyUpdate(false);
     },
     checkoutGroupCart() {
       this.$store.commit('clearCart');
@@ -47,7 +47,7 @@ export default {
       if(this.$store.getters.checkout != true) {
         window.$message.warning('The group cart was checked out')
         this.updateHeader++;
-        this.updateBody++;
+        this.bodyUpdate(true);
       }
     },
     cartClosed() {
@@ -55,13 +55,18 @@ export default {
       this.$store.commit('clearCart');
       this.$store.commit('setGroupCart', -1);
       this.updateHeader++;
-      this.updateBody++;
+      this.bodyUpdate(true);
     }
   },
   methods: {
+    bodyUpdate(p) {
+      if(this.$route.name == 'Cart' || (this.$route.name == 'User' && p)) {
+        this.updateBody++;
+      }
+    },
     updateCart() {
       this.updateHeader++;
-      this.updateBody++;
+      this.bodyUpdate(true);
     },
     addToCart(item) {
       this.$socket.client.emit('addToCart', {
@@ -83,6 +88,9 @@ export default {
           window.$message.error('Cart does not exist');
         } else {
           this.$store.commit('setGroupCart', id);
+          this.$store.commit('setCart', data);
+          this.updateHeader++;
+          this.bodyUpdate(true);
         }
       });
     },
@@ -102,6 +110,7 @@ export default {
         cart_id: gObject['id']
       });
       this.$store.commit('setGroupCart', gObject['id']);
+      this.bodyUpdate(true);
     }
   },
   mounted() {
