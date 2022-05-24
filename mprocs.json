@@ -1,0 +1,16 @@
+{
+  "procs": {
+    "nvim": {
+      "cmd": ["nvim"]
+    },
+    "server": {
+      "cmd": ["./start_server.sh"]
+    },
+    "client": {
+      "shell": "cd client && npm run dev"
+    },
+    "shell": {
+        "cmd": ["fish"]
+    }
+  }
+}
