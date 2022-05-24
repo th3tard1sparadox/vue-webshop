@@ -7,7 +7,9 @@ from flask import Flask, jsonify, request, url_for, redirect, render_template
 from flask_cors import CORS
 from models import *
 
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, JWTManager, get_jwt_identity, get_jwt
+
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
 
 # config
 DEBUG = True
@@ -37,7 +39,12 @@ with app.app_context():
     db.create_all()
 
 # CORS init
-CORS(app, origins=["http://localhost:3000", "http://localhost:5000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
+CORS(app, origins=["http://localhost:3000", "http://localhost:5000", "ws://localhost:5000", "ws://localhost:3000"], allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"], supports_credentials=True)
+
+# socket init
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+carts = {}
 
 # refresh jwt token
 @app.after_request
@@ -131,7 +138,7 @@ def login():
 
     if user:
         access_token = create_access_token(identity=user.id)
-        response = jsonify()
+        response = jsonify({'id': user.id})
         set_access_cookies(response, access_token)
         return response, 201
     else:
@@ -149,7 +156,7 @@ def logout():
 def profile():
     user_id = get_jwt_identity()
     user = User.query.filter_by(id=user_id).first()
-    return jsonify({'email': user.email}), 200
+    return jsonify({'email': user.email, 'id': user_id}), 200
 
 @app.route('/add_to_wishlist', methods=['POST'])
 @jwt_required()
@@ -232,5 +239,80 @@ def decrease_stock():
     db.session.commit()
     return jsonify(), 200
 
+@socketio.on('connectToGroup')
+def connented(data):
+    cart_id = int(data['cart_id'])
+    print(cart_id)
+    if cart_id in carts:
+        join_room(cart_id)
+        emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+        return 200
+    else:
+        return 400
+
+@socketio.on('createGroup')
+def connented(data):
+    cart_id = int(data['cart_id'])
+    carts[cart_id] = []
+    print(carts[cart_id])
+    join_room(cart_id)
+
+@socketio.on('exitGroup')
+def disconnented(data):
+    user_id = int(data['user_id'])
+    cart_id = int(data['cart_id'])
+    if user_id == cart_id:
+        leave_room(cart_id)
+        emit('cartClosed', to=cart_id)
+        del carts[cart_id]
+        close_room(cart_id)
+    else:
+        leave_room(cart_id)
+
+@socketio.on('updateCart')
+def handel_cart_update(data):
+    cart_id = int(data['cart_id'])
+    cart = data['cart']
+    print(cart)
+    emit('updateGroupCart', {'cart': cart}, to=cart_id)
+
+@socketio.on('addToCart')
+def handel_cart_add(data):
+    cart_id = int(data['cart_id'])
+    item = data['item']
+
+    added = False
+    for i in carts[cart_id]:
+        if i['id'] == item['id']:
+            i['quantity'] += item['quantity']
+            added = True
+            break
+    if not added:
+        carts[cart_id].append(item)
+
+    print(carts)
+    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+
+@socketio.on('removeFromCart')
+def handel_cart_remove(data):
+    cart_id = int(data['cart_id'])
+    item = data['item']
+
+    for i in carts[cart_id]:
+        if i['id'] == item['id']:
+            if item['quantity'] >= i['quantity']:
+                carts[cart_id].remove(i)
+            else:
+                i['quantity'] -= item['quantity']
+            break
+
+    print(carts)
+    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+
+@socketio.on('checkoutCart')
+def handel_cart_update(data):
+    cart_id = int(data['cart_id'])
+    emit('checkoutGroupCart', to=cart_id)
+
 if __name__ == '__main__':
-    app.run(port=4242)
+    socketio.run(app)

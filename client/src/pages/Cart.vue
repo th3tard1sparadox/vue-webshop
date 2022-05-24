@@ -1,30 +1,33 @@
 <template>
-    <h1 style="margin-bottom: 2rem;">
-        Cart overview:
-    </h1>
-    <n-list bordered>
-        <n-list-item
-            v-for="product in products"
-            :key="product.id"
-        >
-            <CartItem :id="product.id" :startQuantity="product.quantity" @cartChange="updateCart" />
-        </n-list-item>
-    </n-list>
-    <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
-        <h2>
-            Total: {{ total }} kr
-        </h2>
-        <n-button 
-            ghost 
-            round 
-            @click="checkout"
-        >
-            Checkout
-        </n-button>
-    </div>
+    <n-spin :show="processing">
+        <h1 style="margin-bottom: 2rem;">
+            Cart overview:
+        </h1>
+        <n-list bordered>
+            <n-list-item
+                v-for="product in products"
+                :key="product.id"
+            >
+                <CartItem :id="product.id" :startQuantity="product.quantity" @removeFromCart="removeFromCart" @addToCart="addToCart" @cartChange="cartChange" />
+            </n-list-item>
+        </n-list>
+        <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
+            <h2>
+                Total: {{ total }} kr
+            </h2>
+            <n-button 
+                ghost 
+                round 
+                @click="checkout"
+            >
+                Checkout
+            </n-button>
+        </div>
+    </n-spin>
 </template>
 
 <script>
+import { ref } from 'vue';
 import CartItem from "../components/CartItem.vue";
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
 
@@ -33,23 +36,41 @@ export default {
         products: [],
         total: 0,
         stripe: null,
+        processing: ref(false)
     }),
     components: {
         CartItem,
         StripeCheckout,
     },
     created: function () {
+        this.processing = this.$store.getters.checkout == true;
         this.products = this.$store.getters.cartItems;
         this.total = this.$store.getters.total;
         this.getStripePublishableKey();
     },
     methods: {
-        updateCart: function() {
+        cartChange() {
+            this.$emit('cartChange');
+        },
+        removeFromCart(i) {
             this.products = this.$store.getters.cartItems;
             this.total = this.$store.getters.total;
-            this.$emit('cartChange');
+            this.$emit('removeFromCart', i);
+        }, 
+        addToCart(i) {
+            this.products = this.$store.getters.cartItems;
+            this.total = this.$store.getters.total;
+            this.$emit('addToCart', i);
         }, 
         checkout: async function() {
+            this.$store.commit('setCheckout', true);
+            this.processing = this.$store.getters.checkout == true;
+            if(this.$store.getters.groupCart != -1) {
+                this.$socket.client.emit('checkoutCart', {
+                    cart_id: this.$store.getters.groupCart
+                });
+
+            }
             this.$store.commit('setPayed');
             const gResponse = await fetch("http://localhost:5000/create-checkout-session", {
                 method: 'POST',

@@ -53,7 +53,8 @@ export default defineComponent({
     methods: {
         addToCart() {
             this.$store.commit('addToCart', this.product);
-            this.$emit('cartChange');
+            this.product.quantity = 1;
+            this.$emit('addToCart', this.product);
         },
     },
     setup() {

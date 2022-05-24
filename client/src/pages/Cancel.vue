@@ -6,6 +6,7 @@
 <script>
 export default {
   created: function () {
+    this.$store.commit('setCheckout', false);
     this.$store.commit('unsetPayed');
   }
 }

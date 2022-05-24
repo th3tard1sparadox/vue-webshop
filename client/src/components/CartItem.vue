@@ -54,13 +54,31 @@ export default {
     },
     methods: {
         setItemQuantity(v) {
-            this.$store.commit('setToCart', {product: this.product, amount: v});
-            this.$emit('cartChange');
+            let cart = this.$store.getters.cartItems;
+            let q = 0;
+            for(let i in cart) {
+                if(cart[i]['id'] == this.product['id']) {
+                    q = cart[i]['quantity'];
+                    break;
+                }
+            }
+            if(this.$store.getters.groupCart != -1) {
+                if(q > v) {
+                    this.product.quantity = q - v;
+                    this.$emit('removeFromCart', this.product);
+                } else {
+                    this.product.quantity = v - q;
+                    this.$emit('addToCart', this.product);
+                }
+            } else {
+                this.$store.commit('setToCart', {product: this.product, amount: v});
+                this.$emit('cartChange')
+            }
         },
 
         removeProduct() {
             this.$store.commit('removeCart', this.product);
-            this.$emit('cartChange');
+            this.$emit('removeFromCart', this.product);
         },
 
         productPage: function (e) {

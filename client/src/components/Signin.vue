@@ -40,73 +40,75 @@
 <script>
 import { useMessage } from "naive-ui";
 import { defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
 
 export default defineComponent({
     setup() {
-        const router = useRouter();
-        const formRef = ref(null);
-        const message = useMessage();
-        const formValueRef = ref({
-            user: {
-                email: null,
-                password: null
-            }
-        });
-        const rules = {
-            user: {
-                email: [
-                    {
-                        required: true,
-                        validator(rule, value) {
-                            if(!value) {
-                                return new Error("Email is required");
-                            } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) {
-                                return new Error("Not a valid email")
-                            }
-                            return true;
-                        },
-                        trigger: ["input", "blur"]
-                    }
-                ],
-                password: [
-                    {
-                        required: true,
-                        message: "Password is required"
-                    }
-                ]
-            }
-        };
+        window.$message = useMessage();
+    },
+    data: function() {
         return {
-            formRef,
-            formValue: formValueRef,
-            rules,
-            handleValidateButtonClick(e) {
-                e.preventDefault();
-                formRef.value?.validate(async (errors) => {
-                    if(!errors) {
-                        const gResponse = await fetch("http://localhost:5000/login", {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
+            formRef: ref(null),
+            formValue: ref({
+                user: {
+                    email: null,
+                    password: null
+                }
+            }),
+            rules: {
+                user: {
+                    email: [
+                        {
+                            required: true,
+                            validator(rule, value) {
+                                if(!value) {
+                                    return new Error("Email is required");
+                                } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) {
+                                    return new Error("Not a valid email")
+                                }
+                                return true;
                             },
-                            body: JSON.stringify({email: formValueRef.value.user.email, password: formValueRef.value.user.password}),
-                            credentials: 'include',
-                            mode: 'cors'
-                        });
-                        if(gResponse.ok) {
-                            router.push('/');
-                        } else {
-                            message.error("Login unsuccessful");
+                            trigger: ["input", "blur"]
                         }
+                    ],
+                    password: [
+                        {
+                            required: true,
+                            message: "Password is required"
+                        }
+                    ]
+                }
+            },
+
+        }
+    },
+    methods: {
+        handleValidateButtonClick: function(e) {
+            e.preventDefault();
+            this.$refs.formRef.validate(async (errors) => {
+                if(!errors) {
+                    const gResponse = await fetch("http://localhost:5000/login", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({email: this.formValue.user.email, password: this.formValue.user.password}),
+                        credentials: 'include',
+                        mode: 'cors'
+                    });
+                    if(gResponse.ok) {
+                        const gObject = await gResponse.json();
+                        this.$store.commit('setUserId', gObject['id'])
+                        this.$router.push('/');
                     } else {
-                        console.log(errors);
-                        message.error("Login unsuccessful");
+                        window.$message.error("Login unsuccessful");
                     }
-                })
-            }
-        };
+                } else {
+                    console.log(errors);
+                    window.$message.error("Login unsuccessful");
+                }
+            })
+        }
     }
 })
 </script>
