@@ -41,9 +41,13 @@
 import { useMessage } from "naive-ui";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 export default defineComponent({
     setup() {
+        const store = useStore();
+        console.log(store);
+
         const router = useRouter();
         const formRef = ref(null);
         const message = useMessage();
@@ -96,6 +100,8 @@ export default defineComponent({
                             mode: 'cors'
                         });
                         if(gResponse.ok) {
+                            const gObject = await gResponse.json();
+                            store.commit('setUserId', gObject['id'])
                             router.push('/');
                         } else {
                             message.error("Login unsuccessful");

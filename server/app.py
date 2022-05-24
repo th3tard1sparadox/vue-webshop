@@ -138,7 +138,7 @@ def login():
 
     if user:
         access_token = create_access_token(identity=user.id)
-        response = jsonify()
+        response = jsonify({'id': user.id})
         set_access_cookies(response, access_token)
         return response, 201
     else:

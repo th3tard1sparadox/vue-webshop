@@ -28,9 +28,12 @@
             </n-button>
         </div>
         <div v-else style="display: flex; flex-direction: column; align-items: center;">
-            <h2 style="margin-top: 2rem;">
-                In group cart {{ $store.getters.groupCart }}
-            </h2>
+            <div>
+                <h2 style="margin-top: 2rem;">
+                    In group cart {{ $store.getters.groupCart }}
+                </h2>
+                <h2 v-if="$store.getters.userId == $store.getters.groupCart" > (owner) </h2>
+            </div>
             <n-button ghost round type="error" @click="exitGroup" style="margin-top: 2rem;">
                 Exit cart
             </n-button>
@@ -81,6 +84,7 @@ export default {
             });
             if(gResponse.ok) {
                 this.$router.push('/');
+                this.$store.commit('setUserId', -1);
             }
         }
     },
