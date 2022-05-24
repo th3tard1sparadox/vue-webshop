@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { T } from "@vicons/carbon";
 import NotFound from "./404.vue";
 
 export default {
@@ -72,6 +73,10 @@ export default {
             this.$emit('openCart');
         },
         exitGroup: function(e) {
+            this.$socket.client.emit('exitGroup', {
+                user_id: this.$store.getters.userId,
+                cart_id: this.$store.getters.groupCart
+            });
             this.$store.commit('setGroupCart', -1);
             this.$store.commit('clearCart');
             this.$emit('cartChange');

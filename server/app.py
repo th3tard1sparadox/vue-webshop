@@ -243,8 +243,12 @@ def decrease_stock():
 def connented(data):
     cart_id = int(data['cart_id'])
     print(cart_id)
-    join_room(cart_id)
-    emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+    if cart_id in carts:
+        join_room(cart_id)
+        emit('updateGroupCart', {'cart': carts[cart_id]}, to=cart_id)
+        return 200
+    else:
+        return 400
 
 @socketio.on('createGroup')
 def connented(data):
@@ -253,12 +257,17 @@ def connented(data):
     print(carts[cart_id])
     join_room(cart_id)
 
-@socketio.on('leave')
+@socketio.on('exitGroup')
 def disconnented(data):
-    user = data['user']
+    user_id = int(data['user_id'])
     cart_id = int(data['cart_id'])
-    leave_room(cart_id)
-    send(user + ' left cart', to=cart_id)
+    if user_id == cart_id:
+        leave_room(cart_id)
+        emit('cartClosed', to=cart_id)
+        del carts[cart_id]
+        close_room(cart_id)
+    else:
+        leave_room(cart_id)
 
 @socketio.on('updateCart')
 def handel_cart_update(data):
