@@ -62,18 +62,17 @@ export default {
                     break;
                 }
             }
-            if(this.$store.groupCart != -1) {
+            if(this.$store.getters.groupCart != -1) {
                 if(q > v) {
                     this.product.quantity = q - v;
-                    console.log(this.product.quantity);
                     this.$emit('removeFromCart', this.product);
                 } else {
                     this.product.quantity = v - q;
-                    console.log(this.product.quantity);
                     this.$emit('addToCart', this.product);
                 }
             } else {
                 this.$store.commit('setToCart', {product: this.product, amount: v});
+                this.$emit('cartChange')
             }
         },
 

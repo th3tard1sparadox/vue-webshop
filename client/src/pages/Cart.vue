@@ -8,7 +8,7 @@
                 v-for="product in products"
                 :key="product.id"
             >
-                <CartItem :id="product.id" :startQuantity="product.quantity" @removeFromCart="removeFromCart" @addToCart="addToCart" />
+                <CartItem :id="product.id" :startQuantity="product.quantity" @removeFromCart="removeFromCart" @addToCart="addToCart" @cartChange="cartChange" />
             </n-list-item>
         </n-list>
         <div style="display: flex; margin-top: 2rem; justify-content: space-between;">
@@ -44,14 +44,15 @@ export default {
     },
     created: function () {
         this.processing = this.$store.getters.checkout == true;
-        console.log(this.processing);
         this.products = this.$store.getters.cartItems;
         this.total = this.$store.getters.total;
         this.getStripePublishableKey();
     },
     methods: {
+        cartChange() {
+            this.$emit('cartChange');
+        },
         removeFromCart(i) {
-            console.log('remove in Cart.vue')
             this.products = this.$store.getters.cartItems;
             this.total = this.$store.getters.total;
             this.$emit('removeFromCart', i);

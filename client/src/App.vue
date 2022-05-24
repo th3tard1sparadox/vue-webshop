@@ -9,10 +9,10 @@ import { darkTheme } from 'naive-ui';
       <n-space vertical>
         <n-layout style="height: 100vh; display: flex; flex-direction: column;">
           <n-layout-header bordered>
-            <Header :key="update" />
+            <Header :key="updateHeader" />
           </n-layout-header>
           <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start;">
-            <router-view :key="update" @cartChange="updateCart" @openCart="createGroup" @joinGroup="connectToGroup" @addToCart="addToCart" @removeFromCart="removeFromCart" />
+            <router-view :key="updateBody" @cartChange="updateCart" @openCart="createGroup" @joinGroup="connectToGroup" @addToCart="addToCart" @removeFromCart="removeFromCart" />
           </div>
           <n-layout-footer bordered>
             hello
@@ -27,7 +27,8 @@ import { darkTheme } from 'naive-ui';
 export default {
   data () {
     return {
-      update: 0,
+      updateHeader: 0,
+      updateBody: 0,
     };
   },
   sockets: {
@@ -39,37 +40,36 @@ export default {
     },
     updateGroupCart(cart) {
       this.$store.commit('setCart', cart['cart']);
-      this.update++;
+      this.updateHeader++;
+      this.updateBody++;
     },
     checkoutGroupCart() {
       this.$store.commit('clearCart');
       this.$store.commit('setGroupCart', -1);
       if(this.$store.getters.checkout != true) {
-        this.update++;
+        this.updateHeader++;
+        this.updateBody++;
       }
     }
   },
   methods: {
     updateCart() {
-      this.update++;
-      if(this.$store.getters.groupCart != -1) {
-        this.connectToGroup(this.$store.getters.groupCart);
-      }
+      this.updateHeader++;
+      this.updateBody++;
     },
     addToCart(item) {
-      this.updateCart();
       this.$socket.client.emit('addToCart', {
         cart_id: this.$store.getters.groupCart,
         item: item
       });
+      this.updateHeader++;
     },
     removeFromCart(item) {
-      console.log('Remove in App.vue')
-      this.updateCart();
       this.$socket.client.emit('removeFromCart', {
         cart_id: this.$store.getters.groupCart,
         item: item
       });
+      this.updateHeader++;
     },
     connectToGroup(id) {
       this.$socket.client.emit('connectToGroup', { cart_id: id });
@@ -87,7 +87,6 @@ export default {
           
       });
       const gObject = await gResponse.json();
-      console.log(gObject);
       this.$socket.client.emit('createGroup', {
         cart_id: gObject['id']
       });

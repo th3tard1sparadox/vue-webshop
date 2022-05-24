@@ -59,7 +59,6 @@ export default {
             this.$emit('joinGroup', this.cartId);
         },
         openCart: function(e) {
-            console.log('in profile')
             this.$store.commit('clearCart');
             this.$emit('cartChange');
             this.$emit('openCart');
