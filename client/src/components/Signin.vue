@@ -98,7 +98,8 @@ export default defineComponent({
                     });
                     if(gResponse.ok) {
                         const gObject = await gResponse.json();
-                        this.$store.commit('setUserId', gObject['id'])
+                        this.$store.commit('setUserId', gObject['id']);
+                        this.$store.commit('setEmail', this.formValue.user.email);
                         this.$router.push('/');
                     } else {
                         window.$message.error("Login unsuccessful");

@@ -1,11 +1,12 @@
 import { createStore } from 'vuex'
 
-function updateLocalStorage(cart, p, group, checkout, id) {
+function updateLocalStorage(cart, p, group, checkout, id, email) {
   localStorage.setItem('cart', JSON.stringify(cart));
   localStorage.setItem('payed', p);
   localStorage.setItem('groupCart', group);
   localStorage.setItem('checkout', checkout);
   localStorage.setItem('id', id);
+  localStorage.setItem('email', email);
 }
 
 export default createStore({
@@ -14,9 +15,14 @@ export default createStore({
     payed: false,
     groupCart: -1,
     checkout: false,
-    id: -1
+    id: -1,
+    email: ''
   },
   getters: {
+    email: state => {
+      return state.email;
+    },
+
     userId: state => {
       return state.id;
     },
@@ -46,29 +52,34 @@ export default createStore({
     }
   },
   mutations: {
+    setEmail(state, em) {
+      state.email = em;
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
+    },
+
     setUserId(state, i) {
       state.id = i;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     setCheckout(state, v) {
       state.checkout = v;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     setGroupCart(state, groupCart) {
       state.groupCart = groupCart;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     setPayed (state) {
       state.payed = true;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     unsetPayed (state) {
       state.payed = false;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     addToCart (state, product) {
@@ -80,12 +91,12 @@ export default createStore({
         state.cart.push({...product, quantity: 1});
       }
 
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     setCart (state, cart) {
       state.cart = cart;
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     setToCart (state, payload) {
@@ -103,7 +114,7 @@ export default createStore({
         }
       }
 
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     decreaseCart (state, product) {
@@ -117,7 +128,7 @@ export default createStore({
         }
       }
 
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     removeCart (state, product) {
@@ -127,12 +138,12 @@ export default createStore({
         state.cart = state.cart.filter(i => i.id !== product.id);
       }
 
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     clearCart (state) {
       state.cart = [];
-      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id);
+      updateLocalStorage(state.cart, state.payed, state.groupCart, state.checkout, state.id, state.email);
     },
 
     updateCartFromLocalStorage(state) {
@@ -141,6 +152,7 @@ export default createStore({
       const cart = localStorage.getItem('cart');
       const checkout = localStorage.getItem('checkout');
       const id = localStorage.getItem('id');
+      const email = localStorage.getItem('email');
 
       if(cart) {
         state.cart = JSON.parse(cart);
@@ -160,6 +172,9 @@ export default createStore({
       state.id = id;
       if(state.id == null) {
         state.id = -1;
+      }
+      if(email) {
+        state.email = email;
       }
     }
   }

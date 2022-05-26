@@ -1,7 +1,7 @@
 <template>
     <div style="display: flex; flex: 1 0 auto; flex-direction: column; justify-content: flex-start; align-items: center;">
         <h1>
-            Email: {{ email }}
+            Email: {{ $store.getters.email }}
         </h1>
         <div v-if="$store.getters.groupCart == -1" style="display: flex; flex-direction: column; align-items: center;">
             <div style="flex-direction: row;">
@@ -57,7 +57,6 @@ export default {
     name: "Profile",
     data: function() {
         return {
-            email: '',
             cartId: ''
         }
     },
@@ -112,8 +111,6 @@ export default {
         if(!gResponse.ok) {
             this.$router.replace('/login');
         }
-        const gObject = await gResponse.json();
-        this.email = gObject['email'];
     },
     components: {
         NotFound
