@@ -62,9 +62,6 @@ export default defineComponent({
         const router = useRouter();
         return {
             favoriteItem: async function(e) {
-                message.error("Added to wishlist", {
-                    icon: () => h(NIcon, null, { default: () => h(Favorite) })
-                });
                 e.preventDefault();
                 const gResponse = await fetch("http://localhost:5000/add_to_wishlist", {
                     method: 'POST',
@@ -75,6 +72,17 @@ export default defineComponent({
                     credentials: 'include',
                     mode: 'cors'
                 });
+                if(gResponse.ok) {
+                    message.error("Added to wishlist", {
+                        icon: () => h(NIcon, null, { default: () => h(Favorite) })
+                    });
+                }
+                if(gResponse.status == 500) {
+                    message.error("Item already in wishlist")
+                }
+                if(gResponse.status < 500 && gResponse.status >= 400) {
+                    message.error("Sign in to add things to your wishlist")
+                }
             }
         }
 

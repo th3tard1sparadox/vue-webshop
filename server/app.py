@@ -165,6 +165,8 @@ def add_to_wishlist():
     p_id = request.get_json()
     user = User.query.filter_by(id=user_id).first()
     product = Item.query.filter_by(id=p_id).first()
+    if User.query.filter(User.wishes.any(id=product.id)).first() is not None:
+        return jsonify(), 500
     user.wishes.append(product)
     db.session.commit()
     return jsonify(p_id), 200
