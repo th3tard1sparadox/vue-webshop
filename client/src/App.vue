@@ -14,9 +14,6 @@ window.$message = useMessage();
       <div style="display: flex; flex: 1 0 auto; padding: 2rem; flex-direction: column; justify-content: flex-start;">
         <router-view :key="updateBody" @cartChange="updateCart" @openCart="createGroup" @joinGroup="connectToGroup" @addToCart="addToCart" @removeFromCart="removeFromCart" />
       </div>
-      <n-layout-footer bordered>
-        hello
-      </n-layout-footer>
     </n-layout>
   </n-space>
 </template>
