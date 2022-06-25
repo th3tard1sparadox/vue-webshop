@@ -24,38 +24,28 @@ These are the technological specifications for this project, mainly consisting o
 
 *This is just to get the project started running.*
 
-### Server
+### mprocs
 
-To set up the server, initiate a virtual enviroment in the home folder of the repository using the following command:
+To run this project easily I used the program called [mprocs](https://github.com/pvolok/mprocs). To use it you simply run the command:
 
-    python -m venv env
+    mprocs
 
-Then activate the enviroment, this may be different based on what shell you are running it in. When using bash run:
+in the home folder and the site should be up and running on localhost:3000, with the backend interface on localhost:5000.
 
-    source env/bin/activate
+### Dependencies
 
-If you use fish like me, run:
-
-    source env/bin/activate.fish
-
-When the enviroment is active move into the server folder:
-
-    cd server
-
-Then start the server by running:
-
-    python app.py
-
-You can now do a sanity check by visiting localhost:5000/ping in any browser, where you should see "pong".
-
-### Client
-
-To run the client move into the client folder:
-
-    cd client
-
-Then you can run
-
-    npm run dev
-
-Now you may visit localhost:3000/ping in any browser, where you should see the word pong.
+The dependencies for this project are not available in any file, but most of them can be found below (from memory, so some things might be missing):
+- vue
+    - vue-router
+    - vuex
+    - naive-ui
+    - vue-socket.io-extended
+    - vue-stripe
+- flask
+    - SQLAlchemy
+    - stripe
+    - flask_cors
+    - flask_jwt_extended
+    - flask_socketio
+- mprocs
+- venv
